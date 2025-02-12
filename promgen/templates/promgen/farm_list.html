@@ -10,7 +10,7 @@
 
 {% breadcrumb label="Farms" %}
 
-{% include "promgen/pagination.html" %}
+{% include "promgen/pagination_short.html" %}
 
 <div class="panel panel-default" v-pre>
   <table class="table table-bordered table-condensed">
@@ -33,11 +33,31 @@
         {{ farm.source }}
       </td>
       <td>
-        <ul>
+        {% if farm.host_set.all|length > 10 %}
           {% for host in farm.host_set.all %}
-          <li><a href="{% url 'host-detail' host.name %}">{{ host.name }}</a></li>
+            {% if forloop.counter0 < 10 %}
+              <ul>
+                <li><a href="{% url 'host-detail' host.name %}" v-pre>{{ host.name }}</a></li>
+              </ul>
+            {% endif %}
           {% endfor %}
-        </ul>
+          <details>
+          <summary> <a>Show more...</a> </summary>
+          <ul>
+            {% for host in farm.host_set.all %}
+              {% if forloop.counter0 > 9 %}
+                <li><a href="{% url 'host-detail' host.name %}" v-pre>{{ host.name }}</a></li>
+              {% endif %}
+            {% endfor %}
+          </ul>
+          </details>
+        {% else %}
+          <ul>
+            {% for host in farm.host_set.all %}
+              <li><a href="{% url 'host-detail' host.name %}" v-pre>{{ host.name }}</a></li>
+            {% endfor %}
+          </ul>
+        {% endif %}
       </td>
       <td>
         <ul>
@@ -63,6 +83,6 @@
   </table>
 </div>
 
-{% include "promgen/pagination.html" %}
+{% include "promgen/pagination_short.html" %}
 
 {% endblock %}
