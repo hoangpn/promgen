@@ -82,16 +82,56 @@
       </td>
       <td>
         <ul class="list-unstyled">
-{% for host in farm.host_set.all %}
-          <li>
-            <a href="{% url 'host-detail' host.name %}" v-pre>{{ host.name }}</a>
-            <a
-            @click="setSilenceDataset"
-            class="btn btn-warning btn-xs"
-            data-instance="{{host.name}}:[0-9]*"
-            style="display: inline-block;"
-          >{% trans "Silence" %}</a></li>
-{% endfor %}
+
+        {% if farm.host_set.all|length > 10 %}
+          {% for host in farm.host_set.all %}
+            {% if forloop.counter0 < 10 %}
+              <ul>
+                <li>
+                  <a href="{% url 'host-detail' host.name %}" v-pre>{{ host.name }}</a>
+                  <a
+                  @click="setSilenceDataset"
+                  class="btn btn-warning btn-xs"
+                  data-instance="{{host.name}}:[0-9]*"
+                  style="display: inline-block;"
+                  >{% trans "Silence" %}</a>
+                </li>
+              </ul>
+            {% endif %}
+          {% endfor %}
+          <details>
+          <summary> <a>Show more...</a> </summary>
+          <ul>
+            {% for host in farm.host_set.all %}
+              {% if forloop.counter0 > 9 %}
+                <li>
+                  <a href="{% url 'host-detail' host.name %}" v-pre>{{ host.name }}</a>
+                  <a
+                  @click="setSilenceDataset"
+                  class="btn btn-warning btn-xs"
+                  data-instance="{{host.name}}:[0-9]*"
+                  style="display: inline-block;"
+                  >{% trans "Silence" %}</a>
+                </li>
+              {% endif %}
+            {% endfor %}
+          </ul>
+          </details>
+        {% else %}
+          <ul>
+            {% for host in farm.host_set.all %}
+                <li>
+                  <a href="{% url 'host-detail' host.name %}" v-pre>{{ host.name }}</a>
+                  <a
+                  @click="setSilenceDataset"
+                  class="btn btn-warning btn-xs"
+                  data-instance="{{host.name}}:[0-9]*"
+                  style="display: inline-block;"
+                  >{% trans "Silence" %}</a>
+                </li>
+            {% endfor %}
+          </ul>
+        {% endif %}
         </ul>
       </td>
     </tr>
