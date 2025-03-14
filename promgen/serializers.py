@@ -438,3 +438,32 @@ class RegisterNotifierSerializer(serializers.Serializer):
     alias = serializers.CharField(required=False)
     enabled = serializers.BooleanField(required=False, default=True)
     filters = FilterSerializer(many=True, required=False)
+
+
+class ServiceRetrieveSimpleSerializer(serializers.ModelSerializer):
+    owner = OwnerField()
+
+    class Meta:
+        model = models.Service
+        fields = "__all__"
+
+
+class ServiceRetrieveDetailSerializer(serializers.ModelSerializer):
+    owner = OwnerField()
+    projects = ProjectRetrieveSimpleSerializer(many=True, read_only=True, source="project_set")
+    rules = RuleSerializer(many=True, read_only=True, source="rule_set")
+    notifiers = NotifierSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = models.Service
+        fields = "__all__"
+
+
+class RegisterProjectServiceSerializer(serializers.ModelSerializer):
+    owner = OwnerField()
+    shard = ShardField()
+
+    class Meta:
+        model = models.Project
+        fields = "__all__"
+        read_only_fields = ("service",)
