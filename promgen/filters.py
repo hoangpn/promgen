@@ -205,3 +205,33 @@ class ExporterFilter(django_filters.rest_framework.FilterSet):
         field_name="enabled",
         help_text="Filter by enabled status (true or false). Example: enabled=true",
     )
+
+
+class ProbeChoices:
+    def __iter__(self):
+        return iter(models.Probe.objects.values_list("module", "description"))
+
+    def __len__(self):
+        return models.Probe.objects.values("module").count()
+
+
+class URLFilter(django_filters.rest_framework.FilterSet):
+    project = django_filters.CharFilter(
+        field_name="project__name",
+        lookup_expr="contains",
+        help_text="Filter by project name containing a specific substring. "
+        "Example: project=Example Project",
+    )
+    probe = django_filters.ChoiceFilter(
+        field_name="probe__module",
+        choices=ProbeChoices(),
+        help_text="Filter by exact probe scheme. Example: probe=http_2xx",
+    )
+
+
+class ProbeFilter(django_filters.rest_framework.FilterSet):
+    module = django_filters.CharFilter(
+        field_name="module",
+        lookup_expr="contains",
+        help_text="Filter by probe module containing a specific substring. Example: probe=http_2xx",
+    )
