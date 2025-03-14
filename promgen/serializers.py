@@ -1,6 +1,7 @@
 import collections
 
 from dateutil import parser
+from django.contrib.auth.models import User
 from django.db.models import prefetch_related_objects
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import extend_schema_field
@@ -473,3 +474,58 @@ class ShardRetrieveSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Shard
         exclude = ("authorization",)
+
+
+class UserRetrieveSimpleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ("id", "username", "email", "first_name", "last_name")
+
+
+class UserSubscriptionSerializer(serializers.Serializer):
+    services = ServiceRetrieveSimpleSerializer(many=True)
+    projects = ProjectRetrieveSimpleSerializer(many=True)
+
+
+class UserRetrieveDetailSerializer(serializers.ModelSerializer):
+    notifiers = NotifierSerializer(many=True, required=False, read_only=True)
+    subscriptions = UserSubscriptionSerializer(required=False, read_only=True)
+
+    class Meta:
+        model = User
+        fields = (
+            "id",
+            "username",
+            "email",
+            "first_name",
+            "last_name",
+            "is_staff",
+            "is_superuser",
+            "notifiers",
+            "subscriptions",
+        )
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+
+        representation["notifiers"] = NotifierSerializer(
+            models.Sender.objects.filter(obj=instance), many=True
+        ).data
+        subscriptions = models.Sender.objects.filter(
+            sender="promgen.notification.user", value=str(instance.pk)
+        )
+
+        subscribed_services = []
+        subscribed_projects = []
+        for notifier in subscriptions:
+            if notifier.content_type.model == "service":
+                subscribed_services.append(notifier.content_object)
+            elif notifier.content_type.model == "project":
+                subscribed_projects.append(notifier.content_object)
+
+        representation["subscriptions"] = {
+            "services": ServiceRetrieveSimpleSerializer(subscribed_services, many=True).data,
+            "projects": ProjectRetrieveSimpleSerializer(subscribed_projects, many=True).data,
+        }
+
+        return representation
