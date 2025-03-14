@@ -467,3 +467,9 @@ class RegisterProjectServiceSerializer(serializers.ModelSerializer):
         model = models.Project
         fields = "__all__"
         read_only_fields = ("service",)
+
+
+class ShardRetrieveSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Shard
+        exclude = ("authorization",)

@@ -209,3 +209,9 @@ class RestAPITest(tests.PromgenTest):
             # Delete newly created service to avoid affecting other tests
             if case["case"] == "An authenticated user without permissions can create a service.":
                 models.Service.objects.get(name="new-service").delete()
+
+    @override_settings(PROMGEN=tests.SETTINGS)
+    def test_rest_shard(self):
+        cases = tests.Data("cases", "test_rest_shard.csv").csv()
+        for case in cases:
+            self._run_rest_test(case)
