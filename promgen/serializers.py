@@ -301,3 +301,140 @@ class URLSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.URL
         fields = "__all__"
+
+
+@extend_schema_field(OpenApiTypes.STR)
+class ServiceField(serializers.Field):
+    def to_internal_value(self, data):
+        try:
+            service = models.Service.objects.get(name=data)
+        except models.Service.DoesNotExist:
+            raise serializers.ValidationError("Service does not exist.")
+        return service
+
+    def to_representation(self, value):
+        return value.name
+
+
+@extend_schema_field(OpenApiTypes.STR)
+class ShardField(serializers.Field):
+    def to_internal_value(self, data):
+        try:
+            shard = models.Shard.objects.get(name=data)
+        except models.Shard.DoesNotExist:
+            raise serializers.ValidationError("Shard does not exist.")
+        return shard
+
+    def to_representation(self, value):
+        return value.name
+
+
+@extend_schema_field(OpenApiTypes.STR)
+class OwnerField(serializers.Field):
+    def to_internal_value(self, data):
+        if not data:
+            return serializers.CurrentUserDefault()
+        try:
+            owner = User.objects.get(username=data)
+            if not owner.is_active:
+                raise serializers.ValidationError("owner is not active.")
+        except User.DoesNotExist:
+            raise serializers.ValidationError("Owner does not exist.")
+        return owner
+
+    def to_representation(self, value):
+        return value.username
+
+
+class UserWithPermRetrieveSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    username = serializers.CharField()
+    email = serializers.EmailField()
+    role = serializers.CharField()
+
+
+class GroupWithPermRetrieveSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    name = serializers.CharField()
+    role = serializers.CharField()
+
+
+class PermissionAssignSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    role = serializers.ChoiceField(choices=["ADMIN", "EDITOR", "VIEWER"])
+
+
+class ProjectRetrieveSimpleSerializer(serializers.ModelSerializer):
+    owner = OwnerField()
+    service = ServiceField()
+    shard = ShardField()
+
+    class Meta:
+        model = models.Project
+        fields = "__all__"
+
+
+class ProjectRetrieveDetailSerializer(serializers.ModelSerializer):
+    owner = OwnerField()
+    service = ServiceField()
+    shard = ShardField()
+    farm = FarmRetrieveSerializer()
+    rules = RuleSerializer(many=True, read_only=True, source="rule_set")
+    notifiers = NotifierSerializer(many=True, read_only=True)
+    urls = URLSerializer(many=True, read_only=True, source="url_set")
+
+    class Meta:
+        model = models.Project
+        fields = "__all__"
+
+
+class ProjectUpdateSerializer(serializers.ModelSerializer):
+    owner = OwnerField(required=False)
+    service = ServiceField(required=False, read_only=True)
+    shard = ShardField(required=False)
+    farm = serializers.ReadOnlyField(source="farm.name")
+    name = serializers.CharField(required=False)
+
+    class Meta:
+        model = models.Project
+        fields = "__all__"
+
+
+class LinkFarmSerializer(serializers.Serializer):
+    farm = serializers.CharField()
+    source = serializers.CharField()
+
+
+@extend_schema_field(OpenApiTypes.STR)
+class ProbeField(serializers.Field):
+    def to_internal_value(self, data):
+        try:
+            probe = models.Probe.objects.get(module=data)
+        except models.Probe.DoesNotExist:
+            raise serializers.ValidationError("Probe does not exist.")
+        return probe
+
+    def to_representation(self, value):
+        return value.module
+
+
+class RegisterURLProjectSerializer(serializers.ModelSerializer):
+    probe = ProbeField()
+
+    class Meta:
+        model = models.URL
+        fields = ("url", "probe")
+
+
+class RegisterExporterProjectSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Exporter
+        fields = ("job", "port", "path", "scheme", "enabled")
+
+
+class RegisterNotifierSerializer(serializers.Serializer):
+    sender = serializers.ChoiceField(choices=[name for name, _ in models.Sender.driver_set()])
+    value = serializers.CharField()
+    alias = serializers.CharField(required=False)
+    enabled = serializers.BooleanField(required=False, default=True)
+    filters = FilterSerializer(many=True, required=False)

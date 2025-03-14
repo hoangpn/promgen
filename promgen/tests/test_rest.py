@@ -173,3 +173,29 @@ class RestAPITest(tests.PromgenTest):
         cases = tests.Data("cases", "test_rest_url.csv").csv()
         for case in cases:
             self._run_rest_test(case)
+
+    @override_settings(PROMGEN=tests.SETTINGS)
+    def test_rest_project(self):
+        remote_driver = mock.Mock(remote=True)
+        local_driver = mock.Mock(remote=False)
+        with (
+            mock.patch.object(
+                models.Farm,
+                "driver_set",
+                return_value=[("promgen", local_driver), ("mock-remote", remote_driver)],
+            ),
+            mock.patch.object(
+                models.Farm,
+                "fetch",
+                return_value=["mock-farm-a", "mock-farm-b"],
+            ),
+        ):
+            cases = tests.Data("cases", "test_rest_project.csv").csv()
+            for case in cases:
+                # Delete the current farm to test linking new farm
+                if case["case"] == "An editor can link farm to a project.":
+                    project = models.Project.objects.get(id=1)
+                    project.farm.delete()
+                    project.refresh_from_db()
+
+                self._run_rest_test(case)

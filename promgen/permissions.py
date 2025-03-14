@@ -204,10 +204,19 @@ class PromgenGuardianRestPermission(BasePermission):
         return bool(request.user and request.user.is_authenticated)
 
     def has_object_permission(self, request, view, obj):
-        if request.method == "DELETE" and isinstance(obj, (models.Project, models.Service)):
+        if view.action in ["assign_user", "remove_user", "assign_group", "remove_group"]:
+            perms = ["project_admin", "service_admin"]
+        elif (
+            request.method == "DELETE" and isinstance(obj, (models.Project, models.Service))
+        ) or view.action in ["assign_user", "remove_user", "assign_group", "remove_group"]:
             perms = ["project_admin", "service_admin"]
         elif request.method not in SAFE_METHODS:
-            perms = ["project_editor", "project_admin", "service_editor", "service_admin"]
+            perms = [
+                "project_editor",
+                "project_admin",
+                "service_editor",
+                "service_admin",
+            ]
         else:
             # Always allow user to view the site rule
             if isinstance(obj, models.Rule) and isinstance(obj.content_object, models.Site):
