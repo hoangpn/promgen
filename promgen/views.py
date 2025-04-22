@@ -278,6 +278,76 @@ class AuditList(LoginRequiredMixin, ListView):
         if "user" in self.request.GET:
             queryset = queryset.filter(user_id=self.request.GET["user"])
 
+        # If the user is not a superuser, we need to filter the audits by the user's permissions
+        if not self.request.user.is_superuser:
+            # Get all the services that the user has access to
+            services = get_objects_for_user(
+                self.request.user,
+                ["service_admin", "service_editor", "service_viewer"],
+                any_perm=True,
+                use_groups=False,
+                accept_global_perms=False,
+                klass=models.Service,
+            )
+
+            # Get all the projects that the user has access to
+            projects = get_objects_for_user(
+                self.request.user,
+                ["project_admin", "project_editor", "project_viewer"],
+                any_perm=True,
+                use_groups=False,
+                accept_global_perms=False,
+                klass=models.Project,
+            )
+            projects = models.Project.objects.filter(Q(pk__in=projects) | Q(service__in=services))
+
+            # Get all the farm that the user has access to
+            farms = get_objects_for_user(
+                self.request.user,
+                ["farm_admin", "farm_editor", "farm_viewer"],
+                any_perm=True,
+                use_groups=False,
+                accept_global_perms=False,
+                klass=models.Farm,
+            )
+
+            # Filter the queryset by the user's permissions
+            queryset = queryset.filter(
+                Q(
+                    content_type__model="service",
+                    content_type__app_label="promgen",
+                    object_id__in=services,
+                )
+                | Q(
+                    content_type__model="project",
+                    content_type__app_label="promgen",
+                    object_id__in=projects,
+                )
+                | Q(
+                    content_type__model="farm",
+                    content_type__app_label="promgen",
+                    object_id__in=farms,
+                )
+                | Q(
+                    parent_content_type_id=ContentType.objects.get_for_model(
+                        models.Service
+                    ).id,
+                    parent_object_id__in=services,
+                )
+                | Q(
+                    parent_content_type_id=ContentType.objects.get_for_model(
+                        models.Project
+                    ).id,
+                    parent_object_id__in=projects,
+                )
+                | Q(
+                    parent_content_type_id=ContentType.objects.get_for_model(
+                        models.Farm
+                    ).id,
+                    parent_object_id__in=farms,
+                )
+            )
+
         return queryset
 
     paginate_by = 50
