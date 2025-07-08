@@ -26,12 +26,28 @@
                   </option>
                 </template>
               </select>
-              <input type="text" placeholder=":" style="max-width: 50px; text-align: center;" class="form-control ml-2 mr-2"  disabled>
+              <select
+                v-model="form.operator"
+                class="form-control ml-2 mr-2"
+                style="max-width: 65px; text-align: center;"
+              >
+                <option value="=">=</option>
+                <option value="=~">=~</option>
+                <option value="!=">!=</option>
+                <option value="!~">!~</option>
+                </select>
               <select v-model="form.value" class="form-control" :disabled="!form.label">
                 <option value="" disabled hidden selected>Select a value</option>
                 <option v-for="value in filteredValues" :value="value">[[value]]</option>
               </select>
-              <button type="button" class="btn btn-primary ml-2" @click="addFilterLabel" :disabled="!form.label || !form.value">&plus;</button>
+              <button
+                type="button"
+                class="btn btn-primary ml-2"
+                @click="addFilterLabel"
+                :disabled="!form.label || !form.value || !form.operator"
+              >
+                &plus;
+              </button>
             </div>
           </div>
         </div>
@@ -39,15 +55,21 @@
             <div class="col-md-12">
               <div class="labels">
                 <ul class="list-inline promgen-labels-list">
-                  <li v-for="item in state.labels" :key="`${item.label}-${item.value}`">
+                  <li v-for="item in state.labels" :key="`${item.label}${item.operator}${item.value}`">
                     <div class="promgen-label-target">
                       <span
-                        :title="`${item.label}:${item.value}`"
+                        :title="`${item.label}${item.operator}${item.value}`"
                         class="promgen-silence-matcher-truncate"
                       >
-                        [[item.label]]:[[item.value]]
+                        [[item.label]][[item.operator]][[item.value]]
                       </span>
-                      <span @click="removeFilterLabel(item.label, item.value)" aria-hidden="true" class="promgen-label-close">&times;</span>
+                      <span
+                        @click="removeFilterLabel(item.label, item.value, item.operator)"
+                        aria-hidden="true"
+                        class="promgen-label-close"
+                      >
+                        &times;
+                      </span>
                     </div>
                   </li>
                 </ul>
