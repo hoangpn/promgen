@@ -107,7 +107,7 @@ def render_config(service=None, project=None):
         "project__shard",
         "project",
     ):
-        if not exporter.project.farm:
+        if not getattr(exporter.project, "farm", None):
             continue
         if service and exporter.project.service.name != service.name:
             continue
@@ -230,7 +230,7 @@ def import_config(config, user, replace_shard=None):
         if created:
             logger.debug("Created project %s", project)
             counters["Project"].append(project)
-        elif project.farm != farm:
+        elif getattr(project, "farm", None) != farm:
             logger.debug("Linking farm [%s] with [%s]", farm, project)
             project.farm = farm
             project.save()

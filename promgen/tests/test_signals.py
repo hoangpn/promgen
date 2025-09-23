@@ -62,8 +62,8 @@ class SignalTest(tests.PromgenTest):
         # deleted farm.
         project.refresh_from_db()
 
-        # Deleting our farm will call pre_delete on Farm and post_save on project
-        self.assertEqual(write_mock.call_count, 3, "Should be called after deleting farm")
+        # Deleting our farm will call pre_delete on Farm
+        self.assertEqual(write_mock.call_count, 2, "Should be called after deleting farm")
 
         models.Exporter.objects.create(
             job="Exporter 2",
@@ -74,6 +74,6 @@ class SignalTest(tests.PromgenTest):
         # from creating exporter
         self.assertEqual(
             write_mock.call_count,
-            3,
+            2,
             "No farms, so should not be called after deleting exporter",
         )

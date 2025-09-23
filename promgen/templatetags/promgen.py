@@ -158,8 +158,8 @@ def breadcrumb(instance=None, label=None):
             yield from project(obj.content_object)
 
     def farm(obj):
-        if obj.project_set.first():
-            yield from project(obj.project_set.first())
+        if obj.project:
+            yield from project(obj.project)
         else:
             yield reverse("farm-list"), _("Farms")
         yield obj.get_absolute_url(), obj.name
