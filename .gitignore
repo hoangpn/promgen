@@ -22,3 +22,8 @@ docker/promgen.rule
 docker/blackbox.json
 docker/mysql_data
 docker/prom_data
+
+# Vite ignores
+node_modules
+package-lock.json
+promgen/vite_assets_dist

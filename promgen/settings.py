@@ -231,6 +231,21 @@ AUTHENTICATION_BACKENDS = (
 # Maximum time to wait for all scraping operations to complete (in seconds)
 PROMGEN_EXPORTER_SCRAPE_TIMEOUT = env.int("PROMGEN_EXPORTER_SCRAPE_TIMEOUT", default=25)
 
+# django-vite settings
+DJANGO_VITE = {
+    "default": {
+        "dev_mode": DEBUG,
+        "dev_server_port": 5173,
+        "manifest_path": BASE_DIR / "promgen/vite_assets_dist/.vite/manifest.json",
+    }
+}
+
+# Add the build.outDir from vite.config.js to STATICFILES_DIRS so that collectstatic can collect
+# our compiled vite assets.
+STATICFILES_DIRS = [
+    BASE_DIR / "promgen/vite_assets_dist"
+]
+
 # Load overrides from PROMGEN to replace Django settings
 for k, v in PROMGEN.pop("django", {}).items():
     globals()[k] = v

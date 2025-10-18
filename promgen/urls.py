@@ -19,6 +19,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import include, path
 from django.views.decorators.csrf import csrf_exempt
+from django.views.generic import TemplateView
 from rest_framework import routers
 
 from promgen import proxy, rest, rest_v2, views
@@ -148,6 +149,8 @@ urlpatterns = [
     # Promgen rest API
     path("rest/", include((router.urls, "api"), namespace="api")),
     path("rest/v2/", include((v2_router.urls, "api-v2"), namespace="api-v2")),
+    # Vite single-page-application (experimental)
+    path("vite/", TemplateView.as_view(template_name="vite/index.html"), name="index"),
 ]
 
 try:

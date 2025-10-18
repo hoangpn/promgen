@@ -1,0 +1,16 @@
+{% load django_vite %}
+{% load static %}
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title v-pre>{% block title %}Promgen {{ VERSION }}{% endblock %}</title>
+    <link rel="icon" href="{% static 'images/promgen_logo_color.png' %}" />
+    {% vite_hmr_client %} {% vite_asset "styles/app.css.js" %}
+  </head>
+  <body>
+    {% vite_asset "app.js" %}
+    <div id="vue-app"></div>
+  </body>
+</html>
