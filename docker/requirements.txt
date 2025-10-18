@@ -53,6 +53,7 @@ django==4.2.26
     #   django-filter
     #   django-guardian
     #   django-sri
+    #   django-vite
     #   djangorestframework
     #   drf-spectacular
     #   promgen (pyproject.toml)
@@ -64,6 +65,8 @@ django-filter==23.2
 django-guardian==3.0.0
     # via promgen (pyproject.toml)
 django-sri==0.8.0
+    # via promgen (pyproject.toml)
+django-vite==3.1.0
     # via promgen (pyproject.toml)
 djangorestframework==3.14.0
     # via

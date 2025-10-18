@@ -61,6 +61,7 @@ INSTALLED_APPS = apps_from_setuptools + [
     "promgen",
     # Third Party
     "django_filters",
+    "django_vite",
     "rest_framework.authtoken",
     "rest_framework",
     "social_django",
