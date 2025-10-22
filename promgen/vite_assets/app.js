@@ -5,4 +5,22 @@ import App from "./App.vue";
 const app = createApp(App);
 /****************************/
 
+/******** vue-i18n **********/
+import { createI18n } from "vue-i18n";
+import en from "./locales/en.json";
+import ja from "./locales/ja.json";
+
+const i18n = createI18n({
+  globalInjection: true,
+  legacy: false,
+  locale: "en",
+  messages: {
+    en,
+    ja,
+  },
+});
+
+app.use(i18n);
+/****************************/
+
 app.mount("#vue-app");

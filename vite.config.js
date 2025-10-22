@@ -1,6 +1,7 @@
 import { defineConfig, loadEnv } from "vite";
 import { resolve, join } from "path";
 import vue from "@vitejs/plugin-vue";
+import vueI18n from "@intlify/unplugin-vue-i18n/vite";
 
 export default defineConfig((mode) => {
   const env = loadEnv(mode, process.cwd(), "");
@@ -9,7 +10,7 @@ export default defineConfig((mode) => {
   const OUTPUT_DIR = "./promgen/vite_assets_dist";
 
   return {
-    plugins: [vue()],
+    plugins: [vue(), vueI18n()],
     resolve: {
       alias: {
         "@": resolve(INPUT_DIR),
