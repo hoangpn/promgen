@@ -29,4 +29,10 @@ import router from "./router";
 app.use(router);
 /****************************/
 
+/******** pinia *************/
+import { createPinia } from "pinia";
+
+app.use(createPinia());
+/****************************/
+
 app.mount("#vue-app");

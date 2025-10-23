@@ -1,3 +1,7 @@
 {
-  "msg": "Hello!"
+  "msg": "Hello!",
+  "apple": "apple",
+  "pear": "pear",
+  "melon": "melon",
+  "orange": "orange"
 }
