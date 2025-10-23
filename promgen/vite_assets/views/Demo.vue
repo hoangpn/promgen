@@ -1,26 +1,34 @@
 <script setup>
 import { useDemoStore } from "../stores/demo.js";
+import DataView from "primevue/dataview";
+import Message from "primevue/message";
+import Select from "primevue/select";
 
 const demoStore = useDemoStore();
 </script>
 
 <template>
-  <div class="locale-changer">
-    <select v-model="$i18n.locale">
-      <option
-        v-for="locale in $i18n.availableLocales"
-        :key="`locale-${locale}`"
-        :value="locale"
-      >
-        {{ locale }}
-      </option>
-    </select>
-  </div>
-  <h1>{{ $t("msg") }}</h1>
+  <div class="layout-content">
+    <div class="layout-card">
+      <Select
+        v-model="$i18n.locale"
+        :options="$i18n.availableLocales"
+        placeholder="Select a language"
+      />
+    </div>
 
-  <ul class="store-demo">
-    <li v-for="(fruit, index) in demoStore.fruits" :key="index">
-      {{ $t(fruit) }}
-    </li>
-  </ul>
+    <div class="layout-card">
+      <Message>{{ $t("msg") }}</Message>
+    </div>
+
+    <div class="layout-card">
+      <DataView :value="demoStore.fruits">
+        <template #list="slotProps">
+          <div v-for="(item, index) in slotProps.items" :key="index">
+            {{ $t(item) }}
+          </div>
+        </template>
+      </DataView>
+    </div>
+  </div>
 </template>

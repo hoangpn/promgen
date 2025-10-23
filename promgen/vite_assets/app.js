@@ -35,4 +35,15 @@ import { createPinia } from "pinia";
 app.use(createPinia());
 /****************************/
 
+/******** primevue **********/
+import PrimeVue from "primevue/config";
+import Aura from "@primeuix/themes/aura";
+
+app.use(PrimeVue, {
+  theme: {
+    preset: Aura,
+  },
+});
+/****************************/
+
 app.mount("#vue-app");
