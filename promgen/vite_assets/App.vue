@@ -1,14 +1,9 @@
+<script setup>
+import { RouterView } from "vue-router";
+</script>
+
 <template>
-  <div class="locale-changer">
-    <select v-model="$i18n.locale">
-      <option
-        v-for="locale in $i18n.availableLocales"
-        :key="`locale-${locale}`"
-        :value="locale"
-      >
-        {{ locale }}
-      </option>
-    </select>
+  <div>
+    <RouterView />
   </div>
-  <h1>{{ $t("msg") }}</h1>
 </template>

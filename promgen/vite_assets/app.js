@@ -23,4 +23,10 @@ const i18n = createI18n({
 app.use(i18n);
 /****************************/
 
+/******** vue-router ********/
+import router from "./router";
+
+app.use(router);
+/****************************/
+
 app.mount("#vue-app");
