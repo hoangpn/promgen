@@ -5,6 +5,8 @@ import Message from "primevue/message";
 import Select from "primevue/select";
 
 const demoStore = useDemoStore();
+
+import ServicesList from "../components/ServicesList.vue";
 </script>
 
 <template>
@@ -30,5 +32,7 @@ const demoStore = useDemoStore();
         </template>
       </DataView>
     </div>
+
+    <ServicesList></ServicesList>
   </div>
 </template>
