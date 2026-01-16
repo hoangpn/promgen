@@ -44,6 +44,7 @@ from promgen import (
     models,
     plugins,
     prometheus,
+    redis_client,
     signals,
     tasks,
     util,
@@ -1219,6 +1220,24 @@ class Metrics(View):
             notifier.add_metric([entry["content_type__model"], entry["sender"]], entry["count"])
 
         yield notifier
+
+        yield redis_client.fetch_histogram(
+            "promgen_alert_notification_duration_seconds",
+            "Histogram of alert notification durations in seconds",
+            ["sender_type", "status"],
+        )
+
+        yield redis_client.fetch_counter(
+            "promgen_alert_notifications_total",
+            "Total number of alert notifications",
+            ["sender_type"],
+        )
+
+        yield redis_client.fetch_counter(
+            "promgen_alert_notifications_error_total",
+            "Total number of alert notification errors",
+            ["sender_type", "error_type"],
+        )
 
 
 class Search(LoginRequiredMixin, View):

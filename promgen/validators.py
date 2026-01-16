@@ -53,6 +53,13 @@ scraped_url = URLValidator(
     schemes=["http", "https"],
 )
 
+# This is similar to metricname but without the colon (:) character allowed because we use it as
+# a Redis key prefix with colon as a separator.
+metric_key = RegexValidator(
+    r"^[a-zA-Z_][a-zA-Z0-9_]*$",
+    "Only alphanumeric characters, underscores, or hyphens are allowed.",
+)
+
 
 def datetime(value):
     try:

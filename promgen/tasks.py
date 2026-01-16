@@ -3,6 +3,7 @@
 import collections
 import logging
 import os
+from datetime import datetime
 from urllib.parse import urljoin
 
 from atomicwrites import atomic_write
@@ -10,7 +11,7 @@ from billiard.exceptions import SoftTimeLimitExceeded
 from celery import Task, shared_task
 from requests.exceptions import RequestException
 
-from promgen import models, notification, prometheus, settings, util
+from promgen import models, notification, prometheus, redis_client, settings, util
 
 logger = logging.getLogger(__name__)
 
@@ -137,8 +138,25 @@ def send_notification(*args, alert_pk, **kwargs):
         if isinstance(e, SoftTimeLimitExceeded):
             # Allow Celery to handle retry logic
             raise
+        redis_client.store_counter(
+            key="promgen_alert_notifications_error_total",
+            label_values=[args[0], util.categorize_error(e)],
+        )
+        status = "fail"
     else:
         util.inc_for_pk(models.Alert, pk=alert_pk, sent_count=1)
+        status = "success"
+
+    alert = models.Alert.objects.get(pk=alert_pk)
+    redis_client.store_histogram(
+        key="promgen_alert_notification_duration_seconds",
+        duration=(datetime.now(alert.created.tzinfo) - alert.created).total_seconds(),
+        label_values=[args[0], status],
+    )
+    redis_client.store_counter(
+        key="promgen_alert_notifications_total",
+        label_values=[args[0]],
+    )
 
 
 @shared_task(base=BaseTaskWithRetry)

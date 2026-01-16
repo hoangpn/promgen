@@ -139,6 +139,18 @@ def proxy_error(response: requests.Response) -> HttpResponse:
     return r
 
 
+def categorize_error(e: Exception) -> str:
+    """
+    Categorize an exception into a string label
+    """
+    if isinstance(e, ImportError):
+        return "import_error"
+    elif isinstance(e, requests.HTTPError):
+        return str(e.response.status_code) + "_http_error"
+    else:
+        return "other_error"
+
+
 # Comment wrappers to get the docstrings from the upstream functions
 get.__doc__ = requests.get.__doc__
 post.__doc__ = requests.post.__doc__
