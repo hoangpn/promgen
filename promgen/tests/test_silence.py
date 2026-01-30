@@ -99,3 +99,67 @@ class SilenceTest(tests.PromgenTest):
                 "startsAt": "",
             },
         )
+
+    @override_settings(PROMGEN=TEST_SETTINGS)
+    @mock.patch("promgen.util.post")
+    def test_v2_duration_with_auth(self, mock_post):
+        """Test V2 API sets createdBy from authenticated user's username"""
+        mock_post.return_value.status_code = 200
+
+        with mock.patch("django.utils.timezone.now") as mock_now:
+            mock_now.return_value = datetime.datetime(2017, 12, 14, tzinfo=datetime.timezone.utc)
+            response = self.client.post(
+                reverse("proxy-silence-v2"),
+                data={
+                    "duration": "1m",
+                    "matchers": [
+                        {
+                            "name": "service",
+                            "value": "example",
+                            "isRegex": False,
+                            "isEqual": True,
+                        }
+                    ],
+                },
+                content_type="application/json",
+            )
+
+        # Verify the request succeeded
+        self.assertEqual(response.status_code, 200)
+        # Verify that createdBy was set to the authenticated user's username
+        self.assertTrue(mock_post.called)
+        call_args = mock_post.call_args
+        self.assertEqual(call_args[0][0], "http://alertmanager:9093/api/v2/silences")
+        self.assertEqual(call_args[1]["json"]["createdBy"], "demo")
+
+    @override_settings(PROMGEN=TEST_SETTINGS)
+    @mock.patch("promgen.util.post")
+    def test_v2_custom_created_by(self, mock_post):
+        """Test V2 API respects explicitly provided createdBy"""
+        mock_post.return_value.status_code = 200
+
+        with mock.patch("django.utils.timezone.now") as mock_now:
+            mock_now.return_value = datetime.datetime(2017, 12, 14, tzinfo=datetime.timezone.utc)
+            response = self.client.post(
+                reverse("proxy-silence-v2"),
+                data={
+                    "duration": "1m",
+                    "createdBy": "customuser",
+                    "matchers": [
+                        {
+                            "name": "service",
+                            "value": "example",
+                            "isRegex": False,
+                            "isEqual": True,
+                        }
+                    ],
+                },
+                content_type="application/json",
+            )
+
+        # Verify the request succeeded
+        self.assertEqual(response.status_code, 200)
+        # Verify that custom createdBy is preserved
+        self.assertTrue(mock_post.called)
+        call_args = mock_post.call_args
+        self.assertEqual(call_args[1]["json"]["createdBy"], "customuser")
