@@ -144,7 +144,7 @@ class SilenceTest(tests.PromgenTest):
                 reverse("proxy-silence-v2"),
                 data={
                     "duration": "1m",
-                    "createdBy": "custom@example.com",
+                    "createdBy": "customuser",
                     "matchers": [
                         {
                             "name": "service",
@@ -162,4 +162,4 @@ class SilenceTest(tests.PromgenTest):
         # Verify that custom createdBy is preserved
         self.assertTrue(mock_post.called)
         call_args = mock_post.call_args
-        self.assertEqual(call_args[1]["json"]["createdBy"], "custom@example.com")
+        self.assertEqual(call_args[1]["json"]["createdBy"], "customuser")
