@@ -103,7 +103,7 @@ class SilenceTest(tests.PromgenTest):
     @override_settings(PROMGEN=TEST_SETTINGS)
     @mock.patch("promgen.util.post")
     def test_v2_duration_with_auth(self, mock_post):
-        """Test V2 API sets createdBy from authenticated user"""
+        """Test V2 API sets createdBy from authenticated user's username"""
         mock_post.return_value.status_code = 200
 
         with mock.patch("django.utils.timezone.now") as mock_now:
@@ -126,11 +126,11 @@ class SilenceTest(tests.PromgenTest):
 
         # Verify the request succeeded
         self.assertEqual(response.status_code, 200)
-        # Verify that createdBy was set to the authenticated user's email
+        # Verify that createdBy was set to the authenticated user's username
         self.assertTrue(mock_post.called)
         call_args = mock_post.call_args
         self.assertEqual(call_args[0][0], "http://alertmanager:9093/api/v2/silences")
-        self.assertEqual(call_args[1]["json"]["createdBy"], "demo@example.com")
+        self.assertEqual(call_args[1]["json"]["createdBy"], "demo")
 
     @override_settings(PROMGEN=TEST_SETTINGS)
     @mock.patch("promgen.util.post")

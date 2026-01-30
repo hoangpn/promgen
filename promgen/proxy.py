@@ -183,7 +183,7 @@ class ProxySilences(View):
         body.setdefault("comment", "Silenced from Promgen")
         # Set createdBy from authenticated user, fallback to default if anonymous
         if request.user and request.user.is_authenticated:
-            body.setdefault("createdBy", request.user.email if request.user.email else request.user.username)
+            body.setdefault("createdBy", request.user.username)
         else:
             body.setdefault("createdBy", "Promgen")
 
@@ -229,7 +229,7 @@ class ProxySilencesV2(APIView):
         data = request.data.copy() if hasattr(request.data, 'copy') else dict(request.data)
         # Set createdBy from authenticated user, fallback to default if anonymous
         if request.user and request.user.is_authenticated:
-            data.setdefault("createdBy", request.user.email if request.user.email else request.user.username)
+            data.setdefault("createdBy", request.user.username)
         
         serializer = serializers.SilenceSerializer(data=data)
         if not serializer.is_valid():
