@@ -375,10 +375,36 @@ app.component('exporter-test', {
             // Find the parent form our button belongs to so that we can
             // simulate a form submission
             let form = new FormData(event.srcElement.closest('form'))
-            fetch(this.href, { body: form, method: "post", })
-                .then(result => result.json())
-                .then(result => exporterTestResultStore.setResults(result))
-                .catch(error => alert(error))
+            
+            // Create an AbortController for timeout handling
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+            
+            fetch(this.href, { 
+                body: form, 
+                method: "post",
+                signal: controller.signal
+            })
+                .then(result => {
+                    clearTimeout(timeoutId);
+                    return result.json();
+                })
+                .then(result => {
+                    if (result.__timeout__) {
+                        exporterTestResultStore.setResults(result);
+                        alert('Warning: ' + result.__timeout__);
+                    } else {
+                        exporterTestResultStore.setResults(result);
+                    }
+                })
+                .catch(error => {
+                    clearTimeout(timeoutId);
+                    if (error.name === 'AbortError') {
+                        alert('Request timed out after 30 seconds. The server may be overloaded or some hosts are not responding.');
+                    } else {
+                        alert('Error: ' + error.message);
+                    }
+                })
         }
     }
 });

@@ -658,6 +658,9 @@ class ExporterRegister(LoginRequiredMixin, FormView, mixins.ProjectMixin):
 
 class ExporterScrape(LoginRequiredMixin, View):
     # TODO: Move to /rest/project/<slug>/scrape
+    # Maximum time to wait for all scraping operations to complete (in seconds)
+    SCRAPE_TIMEOUT = 25
+
     def post(self, request, pk):
         # Lookup our farm for testing
         project = get_object_or_404(models.Project, pk=pk)
@@ -681,29 +684,39 @@ class ExporterScrape(LoginRequiredMixin, View):
                             "{scheme}://{host}:{port}{path}".format(host=host.name, **data),
                         )
                     )
-                for future in concurrent.futures.as_completed(futures):
-                    try:
-                        result = future.result()
-                        result.raise_for_status()
-                        metrics = list(text_string_to_metric_families(result.text))
-                        yield (
-                            result.url,
-                            {
-                                "status_code": result.status_code,
-                                "metric_count": len(list(metrics)),
-                            },
-                        )
-                    except ValueError as e:
-                        yield result.url, f"Unable to parse metrics: {e}"
-                    except requests.ConnectionError as e:
-                        logger.warning("Error connecting to server")
-                        yield e.request.url, "Error connecting to server"
-                    except requests.RequestException as e:
-                        logger.warning("Error with response")
-                        yield e.request.url, str(e)
-                    except Exception:
-                        logger.exception("Unknown Exception")
-                        yield "Unknown URL", "Unknown error"
+                try:
+                    for future in concurrent.futures.as_completed(futures, timeout=self.SCRAPE_TIMEOUT):
+                        try:
+                            result = future.result()
+                            result.raise_for_status()
+                            metrics = list(text_string_to_metric_families(result.text))
+                            yield (
+                                result.url,
+                                {
+                                    "status_code": result.status_code,
+                                    "metric_count": len(list(metrics)),
+                                },
+                            )
+                        except ValueError as e:
+                            yield result.url, f"Unable to parse metrics: {e}"
+                        except requests.ConnectionError as e:
+                            logger.warning("Error connecting to server")
+                            yield e.request.url, "Error connecting to server"
+                        except requests.Timeout as e:
+                            logger.warning("Request timeout")
+                            yield e.request.url, "Request timeout - server took too long to respond"
+                        except requests.RequestException as e:
+                            logger.warning("Error with response")
+                            yield e.request.url, str(e)
+                        except Exception:
+                            logger.exception("Unknown Exception")
+                            yield "Unknown URL", "Unknown error"
+                except concurrent.futures.TimeoutError:
+                    logger.warning(f"Scrape operation exceeded {self.SCRAPE_TIMEOUT} second timeout")
+                    # Cancel any remaining futures
+                    for future in futures:
+                        future.cancel()
+                    yield "__timeout__", f"Operation timed out after {self.SCRAPE_TIMEOUT} seconds. Some hosts may not have been scraped."
 
         try:
             return JsonResponse(dict(query()))
