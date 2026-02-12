@@ -701,13 +701,16 @@ class ExporterScrape(LoginRequiredMixin, View):
                             yield result.url, f"Unable to parse metrics: {e}"
                         except requests.ConnectionError as e:
                             logger.warning("Error connecting to server")
-                            yield e.request.url, "Error connecting to server"
+                            url = e.request.url if e.request else "Unknown URL"
+                            yield url, "Error connecting to server"
                         except requests.Timeout as e:
                             logger.warning("Request timeout")
-                            yield e.request.url, "Request timeout - server took too long to respond"
+                            url = e.request.url if e.request else "Unknown URL"
+                            yield url, "Request timeout - server took too long to respond"
                         except requests.RequestException as e:
                             logger.warning("Error with response")
-                            yield e.request.url, str(e)
+                            url = e.request.url if e.request else "Unknown URL"
+                            yield url, str(e)
                         except Exception:
                             logger.exception("Unknown Exception")
                             yield "Unknown URL", "Unknown error"
