@@ -96,6 +96,80 @@ class RouteTests(tests.PromgenTest):
             self.assertRoute(response, views.ExporterScrape, 200)
             self.assertEqual(mock_get.call_args[0][0], url)
 
+    @mock.patch("promgen.util.scrape")
+    def test_scrape_timeout(self, mock_scrape):
+        """Test that scrape operation handles timeouts gracefully"""
+        
+        shard = models.Shard.objects.create(name="test_timeout_shard")
+        service = models.Service.objects.create(name="test_timeout_service", owner=self.user)
+        project = models.Project.objects.create(
+            name="test_timeout_project", service=service, shard=shard, owner=self.user
+        )
+        farm = models.Farm.objects.create(name="test_timeout_farm", project=project)
+        # Create multiple hosts to simulate a scenario with many hosts
+        for i in range(5):
+            farm.host_set.create(name=f"host{i}.example.com")
+
+        # Simulate a timeout by making util.scrape raise a Timeout exception
+        mock_scrape.side_effect = requests.Timeout("Connection timed out")
+
+        body = {
+            "target": "#exporterresult",
+            "job": "foo",
+            "port": 8000,
+            "scheme": "http",
+        }
+
+        response = self.client.post(reverse("exporter-scrape", kwargs={"pk": project.pk}), body)
+        self.assertEqual(response.status_code, 200)
+        
+        # Check that the response contains timeout errors
+        data = response.json()
+        # Each host should have a timeout error
+        timeout_errors = [v for v in data.values() if "timeout" in str(v).lower()]
+        self.assertTrue(len(timeout_errors) > 0, "Should have timeout errors in response")
+
+    @mock.patch("promgen.util.scrape")
+    @mock.patch("promgen.views.ExporterScrape.SCRAPE_TIMEOUT", 2)  # Use a short timeout for testing
+    def test_scrape_overall_timeout(self, mock_scrape):
+        """Test that overall scrape operation times out when individual requests take too long"""
+        import time
+        
+        shard = models.Shard.objects.create(name="test_overall_timeout_shard")
+        service = models.Service.objects.create(name="test_overall_timeout_service", owner=self.user)
+        project = models.Project.objects.create(
+            name="test_overall_timeout_project", service=service, shard=shard, owner=self.user
+        )
+        farm = models.Farm.objects.create(name="test_overall_timeout_farm", project=project)
+        # Create multiple hosts
+        for i in range(10):
+            farm.host_set.create(name=f"host{i}.example.com")
+
+        # Simulate slow responses by sleeping longer than the timeout
+        def slow_scrape(*args, **kwargs):
+            time.sleep(5)  # Sleep longer than the mocked SCRAPE_TIMEOUT (2 seconds)
+            response = requests.Response()
+            response.status_code = 200
+            response._content = b""
+            return response
+        
+        mock_scrape.side_effect = slow_scrape
+
+        body = {
+            "target": "#exporterresult",
+            "job": "foo",
+            "port": 8000,
+            "scheme": "http",
+        }
+
+        response = self.client.post(reverse("exporter-scrape", kwargs={"pk": project.pk}), body)
+        self.assertEqual(response.status_code, 200)
+        
+        # Check that the response contains the overall timeout message
+        data = response.json()
+        self.assertIn("__timeout__", data, "Should have overall timeout key in response")
+        self.assertIn("timed out", data["__timeout__"].lower())
+
     def test_failed_permission(self):
         # Test for redirect
         for request in [{"viewname": "rule-new", "args": ("site", 1)}]:

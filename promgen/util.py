@@ -57,6 +57,8 @@ def scrape(url, params=None, **kwargs):
     # in the Host header to make it match how Prometheus scrapes
     # https://github.com/prometheus/prometheus/blob/2b55017379786873dc00315ffe65e22ad7026abb/scrape/target.go#L375-L387
     headers["Host"] = urlsplit(url).netloc
+    # Set a default timeout if not provided to prevent indefinite hangs
+    kwargs.setdefault("timeout", 15)
     return requests.get(url, params=params, **kwargs)
 
 
