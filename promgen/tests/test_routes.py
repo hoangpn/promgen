@@ -130,6 +130,7 @@ class RouteTests(tests.PromgenTest):
         self.assertTrue(len(timeout_errors) > 0, "Should have timeout errors in response")
 
     @mock.patch("promgen.util.scrape")
+    @mock.patch("promgen.views.ExporterScrape.SCRAPE_TIMEOUT", 2)  # Use a short timeout for testing
     def test_scrape_overall_timeout(self, mock_scrape):
         """Test that overall scrape operation times out when individual requests take too long"""
         import time
@@ -146,7 +147,7 @@ class RouteTests(tests.PromgenTest):
 
         # Simulate slow responses by sleeping longer than the timeout
         def slow_scrape(*args, **kwargs):
-            time.sleep(30)  # Sleep longer than the SCRAPE_TIMEOUT
+            time.sleep(5)  # Sleep longer than the mocked SCRAPE_TIMEOUT (2 seconds)
             response = requests.Response()
             response.status_code = 200
             response._content = b""

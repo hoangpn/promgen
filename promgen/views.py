@@ -694,7 +694,7 @@ class ExporterScrape(LoginRequiredMixin, View):
                                 result.url,
                                 {
                                     "status_code": result.status_code,
-                                    "metric_count": len(list(metrics)),
+                                    "metric_count": len(metrics),
                                 },
                             )
                         except ValueError as e:
