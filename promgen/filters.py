@@ -242,3 +242,12 @@ class UserFilter(django_filters.rest_framework.FilterSet):
         help_text="Filter by email containing a specific substring. "
         "Example: email=example@example.com",
     )
+
+
+class GroupFilter(django_filters.rest_framework.FilterSet):
+    name = django_filters.CharFilter(
+        field_name="name",
+        lookup_expr="contains",
+        help_text="Filter by group name containing a specific substring. "
+        "Example: name=Example Group",
+    )
