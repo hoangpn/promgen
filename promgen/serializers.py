@@ -459,3 +459,23 @@ class GroupObjectPermissionSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserObjectPermission
         fields = ("id", "group", "object", "permission")
+
+
+class ServiceSimpleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Service
+        fields = "__all__"
+
+
+class RegisterServiceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Service
+        fields = "__all__"
+        read_only_fields = ("owner",)
+
+
+class RegisterProjectToServiceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Project
+        fields = "__all__"
+        read_only_fields = ("service", "owner")
