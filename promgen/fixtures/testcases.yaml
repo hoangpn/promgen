@@ -17,6 +17,8 @@
   fields:
     username: demo
     password: demo
+    first_name: Example First Name
+    last_name: Example Last Name
     email: demo@example.com
     is_active: true
 - model: authtoken.token
