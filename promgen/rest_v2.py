@@ -1293,3 +1293,19 @@ class ServiceViewSet(NotifierMixin, RuleMixin, PermissionManagementMixin, viewse
         return Response(
             serializers.ProjectSimpleSerializer(project).data, status=HTTPStatus.CREATED
         )
+
+
+@extend_schema_view(
+    list=extend_schema(summary="List Shards", description="Retrieve a list of all shards."),
+    retrieve=extend_schema(
+        summary="Retrieve Shard",
+        description="Retrieve detailed information about a specific shard.",
+    ),
+)
+@extend_schema(tags=["Shard"])
+class ShardViewSet(mixins.RetrieveModelMixin, mixins.ListModelMixin, viewsets.GenericViewSet):
+    queryset = models.Shard.objects.all()
+    filterset_class = filters.ShardFilter
+    serializer_class = serializers.ShardRetrieveSerializer
+    lookup_field = "id"
+    pagination_class = PromgenPagination
