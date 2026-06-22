@@ -15,7 +15,9 @@
     "proxy": true,
     "enabled": true,
     "samples": 5000000,
-    "targets": 10000
+    "targets": 10000,
+    "samples_count": 0,
+    "targets_count": 0
   },
   "farm": {
     "id": 1,

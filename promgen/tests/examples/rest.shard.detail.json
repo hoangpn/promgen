@@ -5,5 +5,7 @@
   "proxy": true,
   "samples": 5000000,
   "targets": 10000,
-  "url": "http://prometheus.example.com"
+  "url": "http://prometheus.example.com",
+  "samples_count": 0,
+  "targets_count": 0
 }
