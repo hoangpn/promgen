@@ -354,6 +354,9 @@ class UpdateMemberGroupSerializer(serializers.Serializer):
 
 
 class ShardRetrieveSerializer(serializers.ModelSerializer):
+    samples_count = serializers.IntegerField(read_only=True, help_text="Number of samples.")
+    targets_count = serializers.IntegerField(read_only=True, help_text="Number of targets.")
+
     class Meta:
         model = models.Shard
         exclude = ("authorization",)
