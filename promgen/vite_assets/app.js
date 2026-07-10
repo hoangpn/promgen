@@ -38,12 +38,22 @@ app.use(createPinia());
 /******** primevue **********/
 import PrimeVue from "primevue/config";
 import Aura from "@primeuix/themes/aura";
+import Tooltip from 'primevue/tooltip';
 
 app.use(PrimeVue, {
   theme: {
     preset: Aura,
   },
 });
+
+// Register PrimeVue directives
+app.directive('tooltip', Tooltip);
+/****************************/
+
+/******** styles ************/
+// Import Bootstrap CSS (via CDN in index.html, or import here if using npm)
+// Bootstrap is loaded via Django static files
+// PrimeVue theme is applied via PrimeVue config
 /****************************/
 
 app.mount("#vue-app");

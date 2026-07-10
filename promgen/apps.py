@@ -57,7 +57,7 @@ class PromgenConfig(AppConfig):
     default_auto_field = "django.db.models.AutoField"
 
     def ready(self):
-        from promgen import celery, checks, signals  # NOQA
+        from promgen import _celery, checks, signals  # NOQA
 
         post_migrate.connect(default_shard, sender=self)
         post_migrate.connect(default_admin, sender=self)

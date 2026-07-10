@@ -1,17 +1,28 @@
 <script setup>
-import { onBeforeMount } from "vue";
-import { RouterView } from "vue-router";
-import { useServicesStore } from "./stores/services.js";
+import { onMounted } from 'vue';
+import { RouterView } from 'vue-router';
+import { useAuthStore } from './stores';
+import AppLayout from './components/layout/AppLayout.vue';
 
-const servicesStore = useServicesStore();
+const authStore = useAuthStore();
 
-onBeforeMount(() => {
-  servicesStore.init();
+onMounted(async () => {
+  // Initialize auth state
+  try {
+    await authStore.fetchCurrentUser();
+  } catch (error) {
+    console.error('Failed to fetch current user:', error);
+  }
 });
 </script>
 
 <template>
-  <div class="layout-container">
+  <AppLayout>
     <RouterView />
-  </div>
+  </AppLayout>
 </template>
+
+<style scoped>
+/* App-level styles */
+</style>
+

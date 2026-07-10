@@ -1,11 +1,11 @@
 import { ref, computed } from 'vue';
 import { defineStore } from 'pinia';
-import { servicesAPI } from '../api';
+import { rulesAPI, servicesAPI, projectsAPI } from '../api';
 
-export const useServicesStore = defineStore('services', () => {
+export const useRulesStore = defineStore('rules', () => {
   // State
-  const services = ref([]);
-  const currentService = ref(null);
+  const rules = ref([]);
+  const currentRule = ref(null);
   const loading = ref(false);
   const error = ref(null);
   const pagination = ref({
@@ -15,21 +15,24 @@ export const useServicesStore = defineStore('services', () => {
   });
 
   // Getters
-  const servicesCount = computed(() => services.value.length);
+  const rulesCount = computed(() => rules.value.length);
   
-  const getServiceById = computed(() => {
-    return (id) => services.value.find(s => s.id === id);
+  const getRuleById = computed(() => {
+    return (id) => rules.value.find(r => r.id === id);
   });
+
+  const enabledRules = computed(() => rules.value.filter(r => r.enabled));
+  const disabledRules = computed(() => rules.value.filter(r => !r.enabled));
 
   const first = computed(() => (pagination.value.page - 1) * pagination.value.pageSize);
 
   // Actions
-  async function fetchServices(params = {}) {
+  async function fetchRules(params = {}) {
     loading.value = true;
     error.value = null;
     
     try {
-      const response = await servicesAPI.list({
+      const response = await rulesAPI.list({
         page_number: pagination.value.page,
         page_size: pagination.value.pageSize,
         ...params,
@@ -37,129 +40,114 @@ export const useServicesStore = defineStore('services', () => {
       
       // Handle DRF paginated response
       if (response.data.results !== undefined) {
-        services.value = response.data.results;
+        rules.value = response.data.results;
         pagination.value.total = response.data.count || 0;
       } else {
         // Non-paginated response
-        services.value = response.data;
+        rules.value = response.data;
         pagination.value.total = response.data.length;
       }
       
       return response.data;
     } catch (err) {
       error.value = err.response?.data?.detail || err.message;
-      console.error('Error fetching services:', err);
+      console.error('Error fetching rules:', err);
       throw err;
     } finally {
       loading.value = false;
     }
   }
 
-  async function fetchService(id) {
+  async function fetchRule(id) {
     loading.value = true;
     error.value = null;
     
     try {
-      const response = await servicesAPI.get(id);
-      currentService.value = response.data;
+      const response = await rulesAPI.get(id);
+      currentRule.value = response.data;
       return response.data;
     } catch (err) {
       error.value = err.response?.data?.detail || err.message;
-      console.error('Error fetching service:', err);
+      console.error('Error fetching rule:', err);
       throw err;
     } finally {
       loading.value = false;
     }
   }
 
-  async function createService(data) {
+  async function updateRule(id, data) {
     loading.value = true;
     error.value = null;
     
     try {
-      const response = await servicesAPI.create(data);
-      services.value.push(response.data);
-      return response.data;
-    } catch (err) {
-      error.value = err.response?.data?.detail || err.message;
-      console.error('Error creating service:', err);
-      throw err;
-    } finally {
-      loading.value = false;
-    }
-  }
-
-  async function updateService(id, data) {
-    loading.value = true;
-    error.value = null;
-    
-    try {
-      const response = await servicesAPI.update(id, data);
-      const index = services.value.findIndex(s => s.id === id);
+      const response = await rulesAPI.update(id, data);
+      const index = rules.value.findIndex(r => r.id === id);
       if (index !== -1) {
-        services.value[index] = response.data;
+        rules.value[index] = response.data;
       }
-      if (currentService.value?.id === id) {
-        currentService.value = response.data;
+      if (currentRule.value?.id === id) {
+        currentRule.value = response.data;
       }
       return response.data;
     } catch (err) {
       error.value = err.response?.data?.detail || err.message;
-      console.error('Error updating service:', err);
+      console.error('Error updating rule:', err);
       throw err;
     } finally {
       loading.value = false;
     }
   }
 
-  async function deleteService(id) {
+  async function deleteRule(id) {
     loading.value = true;
     error.value = null;
     
     try {
-      await servicesAPI.delete(id);
-      const index = services.value.findIndex(s => s.id === id);
+      await rulesAPI.delete(id);
+      const index = rules.value.findIndex(r => r.id === id);
       if (index !== -1) {
-        services.value.splice(index, 1);
+        rules.value.splice(index, 1);
       }
-      if (currentService.value?.id === id) {
-        currentService.value = null;
+      if (currentRule.value?.id === id) {
+        currentRule.value = null;
       }
     } catch (err) {
       error.value = err.response?.data?.detail || err.message;
-      console.error('Error deleting service:', err);
+      console.error('Error deleting rule:', err);
       throw err;
     } finally {
       loading.value = false;
     }
   }
 
-  async function fetchServiceUsers(id, params = {}) {
+  async function createRuleForService(serviceId, data) {
     loading.value = true;
     error.value = null;
     
     try {
-      const response = await servicesAPI.users.list(id, params);
+      const response = await servicesAPI.rules.create(serviceId, data);
+      rules.value.push(response.data);
       return response.data;
     } catch (err) {
       error.value = err.response?.data?.detail || err.message;
-      console.error('Error fetching service users:', err);
+      console.error('Error creating rule for service:', err);
       throw err;
     } finally {
       loading.value = false;
     }
   }
 
-  async function fetchServiceGroups(id, params = {}) {
+  async function createRuleForProject(projectId, data) {
     loading.value = true;
     error.value = null;
     
     try {
-      const response = await servicesAPI.groups.list(id, params);
+      const response = await projectsAPI.rules.create(projectId, data);
+      rules.value.push(response.data);
       return response.data;
     } catch (err) {
       error.value = err.response?.data?.detail || err.message;
-      console.error('Error fetching service groups:', err);
+      console.error('Error creating rule for project:', err);
       throw err;
     } finally {
       loading.value = false;
@@ -176,26 +164,28 @@ export const useServicesStore = defineStore('services', () => {
 
   return {
     // State
-    services,
-    currentService,
+    rules,
+    currentRule,
     loading,
     error,
     pagination,
     
     // Getters
-    servicesCount,
-    getServiceById,
+    rulesCount,
+    getRuleById,
+    enabledRules,
+    disabledRules,
     first,
     
     // Actions
-    fetchServices,
-    fetchService,
-    createService,
-    updateService,
-    deleteService,
-    fetchServiceUsers,
-    fetchServiceGroups,
+    fetchRules,
+    fetchRule,
+    updateRule,
+    deleteRule,
+    createRuleForService,
+    createRuleForProject,
     setPage,
     setPageSize,
   };
 });
+

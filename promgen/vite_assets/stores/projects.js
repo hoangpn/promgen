@@ -1,11 +1,11 @@
 import { ref, computed } from 'vue';
 import { defineStore } from 'pinia';
-import { servicesAPI } from '../api';
+import { projectsAPI, servicesAPI } from '../api';
 
-export const useServicesStore = defineStore('services', () => {
+export const useProjectsStore = defineStore('projects', () => {
   // State
-  const services = ref([]);
-  const currentService = ref(null);
+  const projects = ref([]);
+  const currentProject = ref(null);
   const loading = ref(false);
   const error = ref(null);
   const pagination = ref({
@@ -15,21 +15,25 @@ export const useServicesStore = defineStore('services', () => {
   });
 
   // Getters
-  const servicesCount = computed(() => services.value.length);
+  const projectsCount = computed(() => projects.value.length);
   
-  const getServiceById = computed(() => {
-    return (id) => services.value.find(s => s.id === id);
+  const getProjectById = computed(() => {
+    return (id) => projects.value.find(p => p.id === id);
+  });
+
+  const projectsByService = computed(() => {
+    return (serviceId) => projects.value.filter(p => p.service?.id === serviceId);
   });
 
   const first = computed(() => (pagination.value.page - 1) * pagination.value.pageSize);
 
   // Actions
-  async function fetchServices(params = {}) {
+  async function fetchProjects(params = {}) {
     loading.value = true;
     error.value = null;
     
     try {
-      const response = await servicesAPI.list({
+      const response = await projectsAPI.list({
         page_number: pagination.value.page,
         page_size: pagination.value.pageSize,
         ...params,
@@ -37,129 +41,129 @@ export const useServicesStore = defineStore('services', () => {
       
       // Handle DRF paginated response
       if (response.data.results !== undefined) {
-        services.value = response.data.results;
+        projects.value = response.data.results;
         pagination.value.total = response.data.count || 0;
       } else {
         // Non-paginated response
-        services.value = response.data;
+        projects.value = response.data;
         pagination.value.total = response.data.length;
       }
       
       return response.data;
     } catch (err) {
       error.value = err.response?.data?.detail || err.message;
-      console.error('Error fetching services:', err);
+      console.error('Error fetching projects:', err);
       throw err;
     } finally {
       loading.value = false;
     }
   }
 
-  async function fetchService(id) {
+  async function fetchProject(id) {
     loading.value = true;
     error.value = null;
     
     try {
-      const response = await servicesAPI.get(id);
-      currentService.value = response.data;
+      const response = await projectsAPI.get(id);
+      currentProject.value = response.data;
       return response.data;
     } catch (err) {
       error.value = err.response?.data?.detail || err.message;
-      console.error('Error fetching service:', err);
+      console.error('Error fetching project:', err);
       throw err;
     } finally {
       loading.value = false;
     }
   }
 
-  async function createService(data) {
+  async function createProject(serviceId, data) {
     loading.value = true;
     error.value = null;
     
     try {
-      const response = await servicesAPI.create(data);
-      services.value.push(response.data);
+      const response = await servicesAPI.projects.create(serviceId, data);
+      projects.value.push(response.data);
       return response.data;
     } catch (err) {
       error.value = err.response?.data?.detail || err.message;
-      console.error('Error creating service:', err);
+      console.error('Error creating project:', err);
       throw err;
     } finally {
       loading.value = false;
     }
   }
 
-  async function updateService(id, data) {
+  async function updateProject(id, data) {
     loading.value = true;
     error.value = null;
     
     try {
-      const response = await servicesAPI.update(id, data);
-      const index = services.value.findIndex(s => s.id === id);
+      const response = await projectsAPI.update(id, data);
+      const index = projects.value.findIndex(p => p.id === id);
       if (index !== -1) {
-        services.value[index] = response.data;
+        projects.value[index] = response.data;
       }
-      if (currentService.value?.id === id) {
-        currentService.value = response.data;
+      if (currentProject.value?.id === id) {
+        currentProject.value = response.data;
       }
       return response.data;
     } catch (err) {
       error.value = err.response?.data?.detail || err.message;
-      console.error('Error updating service:', err);
+      console.error('Error updating project:', err);
       throw err;
     } finally {
       loading.value = false;
     }
   }
 
-  async function deleteService(id) {
+  async function deleteProject(id) {
     loading.value = true;
     error.value = null;
     
     try {
-      await servicesAPI.delete(id);
-      const index = services.value.findIndex(s => s.id === id);
+      await projectsAPI.delete(id);
+      const index = projects.value.findIndex(p => p.id === id);
       if (index !== -1) {
-        services.value.splice(index, 1);
+        projects.value.splice(index, 1);
       }
-      if (currentService.value?.id === id) {
-        currentService.value = null;
+      if (currentProject.value?.id === id) {
+        currentProject.value = null;
       }
     } catch (err) {
       error.value = err.response?.data?.detail || err.message;
-      console.error('Error deleting service:', err);
+      console.error('Error deleting project:', err);
       throw err;
     } finally {
       loading.value = false;
     }
   }
 
-  async function fetchServiceUsers(id, params = {}) {
+  async function fetchProjectUsers(id, params = {}) {
     loading.value = true;
     error.value = null;
     
     try {
-      const response = await servicesAPI.users.list(id, params);
+      const response = await projectsAPI.users.list(id, params);
       return response.data;
     } catch (err) {
       error.value = err.response?.data?.detail || err.message;
-      console.error('Error fetching service users:', err);
+      console.error('Error fetching project users:', err);
       throw err;
     } finally {
       loading.value = false;
     }
   }
 
-  async function fetchServiceGroups(id, params = {}) {
+  async function fetchProjectGroups(id, params = {}) {
     loading.value = true;
     error.value = null;
     
     try {
-      const response = await servicesAPI.groups.list(id, params);
+      const response = await projectsAPI.groups.list(id, params);
       return response.data;
     } catch (err) {
       error.value = err.response?.data?.detail || err.message;
-      console.error('Error fetching service groups:', err);
+      console.error('Error fetching project groups:', err);
       throw err;
     } finally {
       loading.value = false;
@@ -176,26 +180,28 @@ export const useServicesStore = defineStore('services', () => {
 
   return {
     // State
-    services,
-    currentService,
+    projects,
+    currentProject,
     loading,
     error,
     pagination,
     
     // Getters
-    servicesCount,
-    getServiceById,
+    projectsCount,
+    getProjectById,
+    projectsByService,
     first,
     
     // Actions
-    fetchServices,
-    fetchService,
-    createService,
-    updateService,
-    deleteService,
-    fetchServiceUsers,
-    fetchServiceGroups,
+    fetchProjects,
+    fetchProject,
+    createProject,
+    updateProject,
+    deleteProject,
+    fetchProjectUsers,
+    fetchProjectGroups,
     setPage,
     setPageSize,
   };
 });
+
