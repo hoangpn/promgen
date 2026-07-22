@@ -162,3 +162,18 @@ rapi-doc::part(btn) {
 rapi-doc::part(section-navbar-item section-navbar-operations-top) {
     display: flex;
 }
+
+.promgen-permission-panel table th,
+.promgen-permission-panel table td {
+    border: none !important;
+}
+.promgen-permission-panel .panel {
+    border-color: #d8e2ef !important;
+}
+.promgen-permission-panel .panel-body {
+    background-color: #f4f7fc !important;
+}
+.promgen-permission-panel select,
+.promgen-permission-panel .select2 {
+    width: 75% !important;
+}

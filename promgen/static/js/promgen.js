@@ -120,6 +120,14 @@ function initSelect2() {
     multiple: "multiple",
     placeholder: "Select users",
   });
+  $('.promgen-permission-panel select[name="username"]').select2({
+    placeholder: "Enter username, email, or name",
+    theme: "bootstrap",
+  });
+  $('.promgen-permission-panel select[name="group"]').select2({
+    placeholder: "Enter group name",
+    theme: "bootstrap",
+  });
 }
 
 // Activate a tab based on the hash value of the URL

@@ -1,6 +1,10 @@
 {% load i18n %}
 {% load promgen %}
 <div class="panel-group">
+  <div class="alert" style="background-color: #f5f5f5; border: 1px solid #ddd; color: #555;">
+    <span class="glyphicon glyphicon-info-sign text-info" aria-hidden="true"></span>
+    {% trans "After users and groups are added, you can delete them or configure their permissions from their respective lists." %}
+  </div>
   <div class="panel panel-default">
     <div class="panel-heading">
       <h5>Users</h5>
@@ -19,6 +23,9 @@
           {% include "promgen/permission_user_row.html" %}
         {% endfor %}
       </table>
+      {% if role == "ADMIN" %}
+      {% include "promgen/permission_form.html" with perm_type="user" %}
+      {% endif %}
     </div>
   </div>
 
@@ -39,15 +46,9 @@
           {% include "promgen/permission_group_row.html" %}
         {% endfor %}
       </table>
+      {% if role == "ADMIN" %}
+      {% include "promgen/permission_form.html" with perm_type="group" %}
+      {% endif %}
     </div>
   </div>
-
-  {% if role == "ADMIN" %}
-  <div class="panel panel-footer">
-    <div class="panel-heading">
-      <h4>Grant Permissions</h4>
-    </div>
-    <div class="panel-body">{% include "promgen/permission_form.html" %}</div>
-  </div>
-  {% endif %}
 </div>
