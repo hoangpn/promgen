@@ -185,6 +185,52 @@ def fingerprint(body):
     return hashlib.sha1(buff.encode("utf8")).hexdigest()
 
 
+def truncate_json_fields(data, default_limits=128):
+    """
+    Recursively truncate fields in a JSON object.
+
+    Args:
+        data: The JSON to process.
+        default_limits (int): Default maximum length for fields not specified.
+
+    Returns:
+        A new JSON with truncated fields.
+    """
+    # A given field-length mapping for specifying the maximum lengths of fields in Promgen models
+    LOG_FIELD_LIMITS = {
+        "clause": 8192,  # Rule
+    }
+
+    if isinstance(data, list):
+        return [
+            truncate_json_fields(item, default_limits)
+            if isinstance(item, (dict, list))
+            else item[:default_limits]
+            + ("..." if isinstance(item, str) and len(item) > default_limits else "")
+            if isinstance(item, str)
+            else item
+            for item in data
+        ]
+
+    truncated_data = {}
+    if getattr(data, "items", None) is None:
+        return None
+    for field, value in data.items():
+        if isinstance(value, (dict, list)):
+            truncated_data[field] = truncate_json_fields(value, default_limits)
+        elif field in LOG_FIELD_LIMITS and isinstance(value, str):
+            truncated_data[field] = value[: LOG_FIELD_LIMITS[field]] + (
+                "..." if len(value) > LOG_FIELD_LIMITS[field] else ""
+            )
+        elif isinstance(value, str):
+            truncated_data[field] = value[:default_limits] + (
+                "..." if len(value) > default_limits else ""
+            )
+        else:
+            truncated_data[field] = value
+    return truncated_data
+
+
 # Comment wrappers to get the docstrings from the upstream functions
 get.__doc__ = requests.get.__doc__
 post.__doc__ = requests.post.__doc__

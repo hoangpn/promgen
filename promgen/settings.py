@@ -230,6 +230,9 @@ AUTHENTICATION_BACKENDS = (
 # Maximum time to wait for all scraping operations to complete (in seconds)
 PROMGEN_EXPORTER_SCRAPE_TIMEOUT = env.int("PROMGEN_EXPORTER_SCRAPE_TIMEOUT", default=25)
 
+# v2 API settings
+V2_API_LOGGING_ENABLED = env.bool("V2_API_LOGGING_ENABLED", default=True)
+
 # Load overrides from PROMGEN to replace Django settings
 for k, v in PROMGEN.pop("django", {}).items():
     globals()[k] = v
