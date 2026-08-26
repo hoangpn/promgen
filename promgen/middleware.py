@@ -17,8 +17,10 @@ files, we need to handle some deduplication. This is handled by using the django
 caching system to set a key and then triggering the actual event from middleware
 """
 
+import json
 import logging
 import socket
+import uuid
 from datetime import datetime
 from threading import local
 
@@ -26,7 +28,7 @@ from django.contrib import messages
 from django.contrib.admindocs.views import simplify_regex
 from django.db.models import prefetch_related_objects
 
-from promgen import metrics, models
+from promgen import metrics, models, settings, util
 from promgen.signals import trigger_write_config, trigger_write_rules, trigger_write_urls
 
 logger = logging.getLogger(__name__)
@@ -77,9 +79,43 @@ class PromgenMonitoringMiddleware:
         self.get_response = get_response
 
     def __call__(self, request):
+        # Log all requests to our v2 API endpoints
+        if settings.V2_API_LOGGING_ENABLED and request.path.startswith("/rest/v2/"):
+            # Generate a trace ID for each request
+            request.trace_id = str(uuid.uuid4())
+            try:
+                truncated_body = (
+                    util.truncate_json_fields(json.loads(request.body))
+                    if request.body and request.headers["Content-Type"] == "application/json"
+                    else None
+                )
+                logger.info(
+                    f"[Trace ID: {request.trace_id}] "
+                    f"User: {request.user.username if request.user.is_authenticated else None} - "
+                    f"Request: {request.method} {request.get_full_path()} "
+                    f"({len(request.body) if request.body else 0} bytes): "
+                    f"{json.dumps(truncated_body)}"
+                )
+            except Exception as e:
+                logger.exception(
+                    f"[Trace ID: {request.trace_id}] An error occurred when parsing request: {e}"
+                )
+
         started_time = datetime.now()
         response = self.get_response(request)
         finished_time = datetime.now()
+
+        # Log all responses to v2 API endpoints
+        if settings.V2_API_LOGGING_ENABLED and request.path.startswith("/rest/v2/"):
+            try:
+                logger.info(
+                    f"[Trace ID: {request.trace_id}] "
+                    f"Response status: {response.status_code} ({len(response.content)} bytes)"
+                )
+            except Exception as e:
+                logger.exception(
+                    f"[Trace ID: {request.trace_id}] An error occurred when logging response: {e}"
+                )
 
         if request.resolver_match:
             endpoint = simplify_regex(request.resolver_match.route)
