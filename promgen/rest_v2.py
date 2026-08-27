@@ -16,13 +16,13 @@ from drf_spectacular.views import SpectacularAPIView
 from guardian.conf.settings import ANONYMOUS_USER_NAME
 from guardian.models import GroupObjectPermission
 from guardian.shortcuts import assign_perm, get_perms, remove_perm
-from rest_framework import mixins, pagination, routers, viewsets
+from rest_framework import exceptions, mixins, pagination, routers, viewsets
 from rest_framework.authtoken.models import Token
 from rest_framework.decorators import action
 from rest_framework.exceptions import MethodNotAllowed, NotFound, PermissionDenied, ValidationError
 from rest_framework.renderers import TemplateHTMLRenderer
 from rest_framework.response import Response
-from rest_framework.views import APIView
+from rest_framework.views import APIView, exception_handler
 
 import promgen.templatetags.promgen as promgen_templatetags
 from promgen import discovery, filters, models, permissions, serializers, signals, validators
@@ -65,6 +65,19 @@ class Router(routers.DefaultRouter):
         )
 
         return urls
+
+
+def custom_exception_handler(exc, context):
+    # Call REST framework's default exception handler first,
+    # to get the standard error response.
+    response = exception_handler(exc, context)
+
+    if response is None:
+        # If the response is None, an unexpected Python or Django exception occurs.
+        # We will return a server_error response.
+        return exceptions.server_error(context["request"])
+
+    return response
 
 
 class PromgenPagination(pagination.PageNumberPagination):
