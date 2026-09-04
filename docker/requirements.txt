@@ -52,6 +52,7 @@ django==4.2.26
     # via
     #   django-filter
     #   django-guardian
+    #   django-rest-knox
     #   django-sri
     #   djangorestframework
     #   drf-spectacular
@@ -63,10 +64,13 @@ django-filter==23.2
     # via promgen (pyproject.toml)
 django-guardian==3.0.0
     # via promgen (pyproject.toml)
+django-rest-knox==5.0.4
+    # via promgen (pyproject.toml)
 django-sri==0.8.0
     # via promgen (pyproject.toml)
 djangorestframework==3.14.0
     # via
+    #   django-rest-knox
     #   drf-spectacular
     #   promgen (pyproject.toml)
 drf-spectacular==0.29.0

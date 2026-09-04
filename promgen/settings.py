@@ -63,6 +63,7 @@ INSTALLED_APPS = apps_from_setuptools + [
     "django_filters",
     "rest_framework.authtoken",
     "rest_framework",
+    "knox",
     "social_django",
     "sri",
     "guardian",
