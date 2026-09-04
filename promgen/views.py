@@ -1368,7 +1368,7 @@ class Profile(LoginRequiredMixin, mixins.NotifierFormMixin):
         context["subscriptions"] = models.Sender.objects.filter(
             sender="promgen.notification.user", value=str(self.request.user.pk)
         )
-        context["api_token"] = Token.objects.filter(user=self.request.user).first()
+        context["api_tokens"] = models.AuthToken.objects.filter(user=self.request.user)
         return context
 
     def form_valid(self, form):
