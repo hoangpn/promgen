@@ -34,7 +34,6 @@ from guardian.models import GroupObjectPermission
 from guardian.shortcuts import assign_perm, get_perms, remove_perm
 from prometheus_client.core import CounterMetricFamily, GaugeMetricFamily
 from prometheus_client.parser import text_string_to_metric_families
-from rest_framework.authtoken.models import Token
 
 import promgen.templatetags.promgen as macro
 from promgen import (
@@ -1917,8 +1916,9 @@ class ProfileTokenGenerate(LoginRequiredMixin, FormView):
 
 
 class ProfileTokenDelete(LoginRequiredMixin, View):
-    def get(self, request):
-        Token.objects.filter(user=request.user).delete()
+    def post(self, request):
+        digest = request.POST["digest"]
+        models.AuthToken.objects.filter(digest=digest, user=self.request.user).delete()
         messages.success(request, "API token deleted successfully for " + request.user.username)
         return redirect("profile")
 

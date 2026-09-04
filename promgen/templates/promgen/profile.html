@@ -32,14 +32,15 @@
       </td>
       <td>
         <form
-          method="get"
+          method="post"
           action="{% url 'token-delete' %}"
           style="display: inline"
           onsubmit="return confirm('{% trans 'Are you sure?' %}')"
         >
           {% csrf_token %}
+          <input type="hidden" name="digest" value="{{ token.digest }}" />
           <button class="btn btn-danger btn-xs">
-            Delete Token
+            Delete
           </button>
         </form>
       </td>
