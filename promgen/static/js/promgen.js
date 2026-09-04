@@ -245,4 +245,20 @@ $(document).ready(function() {
 
     setIcon(panel.hasClass("in"));
   });
+
+  // Copy-to-clipboard event
+  $("#copy-to-clipboard-btn").tooltip();
+  $("#copy-to-clipboard-btn").click(function() {
+    var copyText = document.getElementById("copy-to-clipboard-input").value;
+    navigator.clipboard.writeText(copyText).then(function() {
+      $("#copy-to-clipboard-btn")
+        .attr("data-original-title", "Copied!")
+        .tooltip('show');
+      // Reset the tooltip text after mouse leaves the button
+      $("#copy-to-clipboard-btn").mouseleave(function() {
+        $(this).attr("data-original-title", "Copy to clipboard");
+      });
+    })
+  });
+
 });

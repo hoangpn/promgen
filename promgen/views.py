@@ -1896,14 +1896,24 @@ class RuleTest(LoginRequiredMixin, View):
         )
 
 
-class ProfileTokenGenerate(LoginRequiredMixin, View):
-    def get(self, request):
-        Token.objects.filter(user=request.user).delete()
-        Token.objects.create(user=request.user)
-        messages.success(
-            request, "New API token generated successfully for " + request.user.username
+class ProfileTokenGenerate(LoginRequiredMixin, FormView):
+    template_name = "promgen/token_generate.html"
+    form_class = forms.TokenGenerationForm
+
+    def form_valid(self, form):
+        expiry = None
+        if form.cleaned_data["expiration_days"]:
+            expiry = datetime.timedelta(days=form.cleaned_data["expiration_days"])
+
+        _, token = models.AuthToken.objects.create(
+            user=self.request.user,
+            name=form.cleaned_data["name"],
+            expiry=expiry,
         )
-        return redirect("profile")
+
+        return self.render_to_response(
+            self.get_context_data(form=self.form_class(), auth_token=token)
+        )
 
 
 class ProfileTokenDelete(LoginRequiredMixin, View):

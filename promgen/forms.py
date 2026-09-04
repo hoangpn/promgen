@@ -2,6 +2,7 @@
 # These sources are released under the terms of the MIT license: see LICENSE
 
 import re
+import uuid
 from functools import partial
 
 from dateutil import parser
@@ -13,6 +14,7 @@ from guardian.conf.settings import ANONYMOUS_USER_NAME
 from guardian.shortcuts import get_perms_for_model
 
 from promgen import errors, models, plugins, prometheus, validators
+from promgen.middleware import get_current_user
 
 
 class ImportConfigForm(forms.Form):
@@ -410,3 +412,24 @@ class UserMergeForm(forms.Form):
             )
 
         return cleaned_data
+
+
+class TokenGenerationForm(forms.Form):
+    default_name = forms.CharField(required=False, widget=forms.HiddenInput())
+    name = forms.CharField(max_length=64, required=False, help_text=_("Token name (max 64 chars)"))
+    expiration_days = forms.IntegerField(
+        required=False,
+        min_value=1,
+        help_text=_("Token expiration in days (optional, must be a positive integer)"),
+    )
+
+    def __init__(self, *args, **kwargs):
+        super(TokenGenerationForm, self).__init__(*args, **kwargs)
+        default_name = f"{get_current_user().username}-{uuid.uuid4()}"
+        self.initial["default_name"] = default_name
+        self.fields["name"].widget.attrs["placeholder"] = default_name
+
+    def clean_name(self):
+        if not self.cleaned_data["name"]:
+            return self.cleaned_data["default_name"]
+        return self.cleaned_data["name"]

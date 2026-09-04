@@ -16,7 +16,6 @@
       <th>Expires At</th>
       <th>Actions</th>
     </tr>
-    {% if api_tokens %}
     {% for token in api_tokens %}
     <tr>
       <td>{{ token.name }}</td>
@@ -34,17 +33,6 @@
       <td>
         <form
           method="get"
-          action="{% url 'token-generate' %}"
-          style="display: inline"
-          onsubmit="return confirm('{% trans 'Are you sure? The current token will become invalid.' %}')"
-        >
-          {% csrf_token %}
-          <button class="btn btn-primary btn-xs">
-            Regenerate Token
-          </button>
-        </form>
-        <form
-          method="get"
           action="{% url 'token-delete' %}"
           style="display: inline"
           onsubmit="return confirm('{% trans 'Are you sure?' %}')"
@@ -57,20 +45,11 @@
       </td>
     </tr>
     {% endfor %}
-    {% else %}
     <tr>
-      <td>
-      </td>
-      <td>
-      <form method="get" action="{% url 'token-generate' %}">
-        {% csrf_token %}
-        <button class="btn btn-primary btn-xs">
-          Generate Token
-        </button>
-      </form>
+      <td colspan="4">
+        <a href="{% url 'token-generate' %}">{% translate "Generate New Token" %}</a>
       </td>
     </tr>
-    {% endif %}
   </table>
 </div>
 
