@@ -235,6 +235,8 @@ PROMGEN_EXPORTER_SCRAPE_TIMEOUT = env.int("PROMGEN_EXPORTER_SCRAPE_TIMEOUT", def
 # v2 API settings
 V2_API_LOGGING_ENABLED = env.bool("V2_API_LOGGING_ENABLED", default=True)
 
+KNOX_TOKEN_MODEL = "promgen.AuthToken"
+
 # Load overrides from PROMGEN to replace Django settings
 for k, v in PROMGEN.pop("django", {}).items():
     globals()[k] = v

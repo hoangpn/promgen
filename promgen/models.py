@@ -5,6 +5,7 @@ import json
 import logging
 
 import django.contrib.sites.models
+import knox.models
 from django.conf import settings
 from django.contrib.auth.models import Group, User
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
@@ -789,3 +790,14 @@ class MetricSample(models.Model):
 
     class Meta:
         unique_together = (("metric", "labels"),)
+
+
+class AuthToken(knox.models.AbstractAuthToken):
+    name = models.CharField(max_length=64)
+
+    @property
+    def is_expired(self):
+        if self.expiry is not None:
+            if self.expiry < timezone.now():
+                return True
+        return False
