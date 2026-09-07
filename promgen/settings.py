@@ -61,7 +61,6 @@ INSTALLED_APPS = apps_from_setuptools + [
     "promgen",
     # Third Party
     "django_filters",
-    "rest_framework.authtoken",
     "rest_framework",
     "knox",
     "social_django",
@@ -192,7 +191,7 @@ if "SENTRY_DSN" in os.environ:
 
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
-        "rest_framework.authentication.TokenAuthentication",
+        "knox.auth.TokenAuthentication",
         "rest_framework.authentication.SessionAuthentication",
     ),
     "DEFAULT_PERMISSION_CLASSES": (

@@ -22,17 +22,21 @@
     email: demo@example.com
     is_active: true
     date_joined: 2026-08-05T00:00:00Z
-- model: authtoken.token
+- model: promgen.authtoken
   pk: 1
   fields:
-    user: 1
-    key: admin_token
+    name: admin_token
+    digest: aa737cd123acfc3e84a579f2ccbc66859f0a9fe6156f31019f0c25e963794d0ca2b205df2b9092340c28909a3c96c7cd211a63872b5df75c1a9345002a9254dd
+    user_id: 1
+    token_key: admin_token
     created: 2024-03-18T00:00:00Z
-- model: authtoken.token
+- model: promgen.authtoken
   pk: 2
   fields:
-    user: 2
-    key: demo_token
+    name: demo_token
+    digest: 2ca4bea592c85b3996047d1121dfd428670ece2805050fd9906a23c0942fb745aebcd59f751727f0f4dc24e3efa9b71219b6a8b8866d3ffb3d9f3f8a329dcb47
+    user_id: 2
+    token_key: demo_token
     created: 2024-03-18T00:00:00Z
 - model: promgen.shard
   pk: 1
