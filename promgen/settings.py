@@ -235,6 +235,10 @@ PROMGEN_EXPORTER_SCRAPE_TIMEOUT = env.int("PROMGEN_EXPORTER_SCRAPE_TIMEOUT", def
 # v2 API settings
 V2_API_LOGGING_ENABLED = env.bool("V2_API_LOGGING_ENABLED", default=True)
 
+# When set, Promgen will not allow the creation of API tokens with expiry greater than this setting.
+# None means unlimited.
+API_TOKEN_TTL_DAYS = env.int("API_TOKEN_TTL_DAYS", default=None)
+
 KNOX_TOKEN_MODEL = "promgen.AuthToken"
 
 # Load overrides from PROMGEN to replace Django settings
