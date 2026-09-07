@@ -47,9 +47,18 @@
     </tr>
     {% endfor %}
     <tr>
+      {% if not api_quota or api_tokens|length < api_quota %}
       <td colspan="4">
         <a href="{% url 'token-generate' %}">{% translate "Generate New Token" %}</a>
       </td>
+      {% else %}
+      <td colspan="4">
+        <p class="text-danger">
+          You have reached the maximum number of API tokens allowed ({{api_quota}}).
+          Please delete an existing token before creating a new one.
+        </p>
+      </td>
+      {% endif %}
     </tr>
   </table>
 </div>

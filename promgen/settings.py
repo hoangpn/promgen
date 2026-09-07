@@ -239,6 +239,9 @@ V2_API_LOGGING_ENABLED = env.bool("V2_API_LOGGING_ENABLED", default=True)
 # None means unlimited.
 API_TOKEN_TTL_DAYS = env.int("API_TOKEN_TTL_DAYS", default=None)
 
+# Number of tokens a user is allowed to create. None means unlimited.
+API_TOKEN_MAX_QUOTA = env.int("API_TOKEN_MAX_QUOTA", default=None)
+
 KNOX_TOKEN_MODEL = "promgen.AuthToken"
 
 # Load overrides from PROMGEN to replace Django settings

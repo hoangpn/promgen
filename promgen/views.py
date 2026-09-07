@@ -1368,6 +1368,7 @@ class Profile(LoginRequiredMixin, mixins.NotifierFormMixin):
             sender="promgen.notification.user", value=str(self.request.user.pk)
         )
         context["api_tokens"] = models.AuthToken.objects.filter(user=self.request.user)
+        context["api_quota"] = settings.API_TOKEN_MAX_QUOTA
         return context
 
     def form_valid(self, form):
@@ -1898,6 +1899,18 @@ class RuleTest(LoginRequiredMixin, View):
 class ProfileTokenGenerate(LoginRequiredMixin, FormView):
     template_name = "promgen/token_generate.html"
     form_class = forms.TokenGenerationForm
+
+    def post(self, request):
+        existing_tokens = models.AuthToken.objects.filter(user=self.request.user).count()
+        if settings.API_TOKEN_MAX_QUOTA and existing_tokens >= settings.API_TOKEN_MAX_QUOTA:
+            messages.error(
+                request,
+                f"You have reached the maximum number of API tokens allowed "
+                f"({settings.API_TOKEN_MAX_QUOTA}). Please delete an existing token before "
+                f"creating a new one.",
+            )
+            return redirect("profile")
+        return super().post(request)
 
     def form_valid(self, form):
         expiry = None
