@@ -261,4 +261,14 @@ $(document).ready(function() {
     })
   });
 
+  // Set the Knox API token for RapiDoc
+  $("#api-token-button").click(function() {
+    const token = $("#api-token-input").val();
+    if (token) {
+      const rapidoc = document.getElementById("rapidoc");
+      rapidoc.setApiKey("knoxApiToken", "Token " + token);
+      $("#api-token-label").text("API Token set to: " + token);
+    }
+  });
+
 });
