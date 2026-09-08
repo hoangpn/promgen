@@ -12,6 +12,7 @@ from django.core.exceptions import ValidationError
 from django.utils.translation import gettext as _
 from guardian.conf.settings import ANONYMOUS_USER_NAME
 from guardian.shortcuts import get_perms_for_model
+from knox.admin import AuthTokenCreateForm
 
 from promgen import errors, models, plugins, prometheus, settings, validators
 from promgen.middleware import get_current_user
@@ -442,3 +443,9 @@ class TokenGenerationForm(forms.Form):
         if not self.cleaned_data["name"]:
             return self.cleaned_data["default_name"]
         return self.cleaned_data["name"]
+
+
+class PromgenAuthTokenCreateForm(AuthTokenCreateForm):
+    class Meta:
+        model = models.AuthToken
+        fields = ("name", "user", "expiry")
