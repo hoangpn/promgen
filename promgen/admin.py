@@ -10,8 +10,10 @@ from django.contrib.auth.models import User
 from django.core import validators
 from django.urls import path
 from django.utils.html import format_html
+from knox.admin import AuthTokenAdmin
 
 from promgen import actions, models, plugins, views
+from promgen.forms import PromgenAuthTokenCreateForm
 from promgen.notification.email import NotificationEmail
 
 
@@ -200,3 +202,11 @@ class PromgenUserAdmin(UserAdmin):
 
 admin.site.unregister(User)
 admin.site.register(User, PromgenUserAdmin)
+
+
+@admin.register(models.AuthToken)
+class AuthTokenAdmin(AuthTokenAdmin):
+    add_form = PromgenAuthTokenCreateForm
+    list_display = ("name", "user", "created", "expiry", "token_key")
+    list_filter = ("name", "user", "token_key")
+    readonly_fields = ("digest", "token_key")

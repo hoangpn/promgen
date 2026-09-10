@@ -2,6 +2,7 @@
 # These sources are released under the terms of the MIT license: see LICENSE
 
 import re
+import uuid
 from functools import partial
 
 from dateutil import parser
@@ -11,8 +12,10 @@ from django.core.exceptions import ValidationError
 from django.utils.translation import gettext as _
 from guardian.conf.settings import ANONYMOUS_USER_NAME
 from guardian.shortcuts import get_perms_for_model
+from knox.admin import AuthTokenCreateForm
 
-from promgen import errors, models, plugins, prometheus, validators
+from promgen import errors, models, plugins, prometheus, settings, validators
+from promgen.middleware import get_current_user
 
 
 class ImportConfigForm(forms.Form):
@@ -410,3 +413,39 @@ class UserMergeForm(forms.Form):
             )
 
         return cleaned_data
+
+
+class TokenGenerationForm(forms.Form):
+    default_name = forms.CharField(required=False, widget=forms.HiddenInput())
+    name = forms.CharField(max_length=64, required=False, help_text=_("Token name (max 64 chars)"))
+    expiration_days = forms.IntegerField(
+        required=settings.API_TOKEN_TTL_DAYS,
+        min_value=1,
+        max_value=settings.API_TOKEN_TTL_DAYS,
+    )
+
+    def __init__(self, *args, **kwargs):
+        super(TokenGenerationForm, self).__init__(*args, **kwargs)
+        default_name = f"{get_current_user().username}-{uuid.uuid4()}"
+        self.initial["default_name"] = default_name
+        self.fields["name"].widget.attrs["placeholder"] = default_name
+
+        if settings.API_TOKEN_TTL_DAYS:
+            self.fields["expiration_days"].help_text = _(
+                "Token expiration in days (max %d)" % settings.API_TOKEN_TTL_DAYS
+            )
+        else:
+            self.fields["expiration_days"].help_text = _(
+                "Token expiration in days. Leave blank for no expiration."
+            )
+
+    def clean_name(self):
+        if not self.cleaned_data["name"]:
+            return self.cleaned_data["default_name"]
+        return self.cleaned_data["name"]
+
+
+class PromgenAuthTokenCreateForm(AuthTokenCreateForm):
+    class Meta:
+        model = models.AuthToken
+        fields = ("name", "user", "expiry")

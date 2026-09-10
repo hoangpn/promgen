@@ -17,7 +17,6 @@ from guardian.conf.settings import ANONYMOUS_USER_NAME
 from guardian.models import GroupObjectPermission
 from guardian.shortcuts import assign_perm, get_perms, remove_perm
 from rest_framework import exceptions, mixins, pagination, routers, viewsets
-from rest_framework.authtoken.models import Token
 from rest_framework.decorators import action
 from rest_framework.exceptions import MethodNotAllowed, NotFound, PermissionDenied, ValidationError
 from rest_framework.renderers import TemplateHTMLRenderer
@@ -35,9 +34,9 @@ class SpectacularRapiDocView(APIView):
 
     @extend_schema(exclude=True)
     def get(self, request):
-        api_token = Token.objects.filter(user=self.request.user).first()
+        api_tokens = models.AuthToken.objects.filter(user=self.request.user)
         return Response(
-            data={"api_token": api_token},
+            data={"api_tokens": api_tokens},
             template_name=self.template_name,
         )
 

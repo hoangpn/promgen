@@ -34,7 +34,6 @@ from guardian.models import GroupObjectPermission
 from guardian.shortcuts import assign_perm, get_perms, remove_perm
 from prometheus_client.core import CounterMetricFamily, GaugeMetricFamily
 from prometheus_client.parser import text_string_to_metric_families
-from rest_framework.authtoken.models import Token
 
 import promgen.templatetags.promgen as macro
 from promgen import (
@@ -1368,7 +1367,8 @@ class Profile(LoginRequiredMixin, mixins.NotifierFormMixin):
         context["subscriptions"] = models.Sender.objects.filter(
             sender="promgen.notification.user", value=str(self.request.user.pk)
         )
-        context["api_token"] = Token.objects.filter(user=self.request.user).first()
+        context["api_tokens"] = models.AuthToken.objects.filter(user=self.request.user)
+        context["api_quota"] = settings.API_TOKEN_MAX_QUOTA
         return context
 
     def form_valid(self, form):
@@ -1896,19 +1896,42 @@ class RuleTest(LoginRequiredMixin, View):
         )
 
 
-class ProfileTokenGenerate(LoginRequiredMixin, View):
-    def get(self, request):
-        Token.objects.filter(user=request.user).delete()
-        Token.objects.create(user=request.user)
-        messages.success(
-            request, "New API token generated successfully for " + request.user.username
+class ProfileTokenGenerate(LoginRequiredMixin, FormView):
+    template_name = "promgen/token_generate.html"
+    form_class = forms.TokenGenerationForm
+
+    def post(self, request):
+        existing_tokens = models.AuthToken.objects.filter(user=self.request.user).count()
+        if settings.API_TOKEN_MAX_QUOTA and existing_tokens >= settings.API_TOKEN_MAX_QUOTA:
+            messages.error(
+                request,
+                f"You have reached the maximum number of API tokens allowed "
+                f"({settings.API_TOKEN_MAX_QUOTA}). Please delete an existing token before "
+                f"creating a new one.",
+            )
+            return redirect("profile")
+        return super().post(request)
+
+    def form_valid(self, form):
+        expiry = None
+        if form.cleaned_data["expiration_days"]:
+            expiry = datetime.timedelta(days=form.cleaned_data["expiration_days"])
+
+        _, token = models.AuthToken.objects.create(
+            user=self.request.user,
+            name=form.cleaned_data["name"],
+            expiry=expiry,
         )
-        return redirect("profile")
+
+        return self.render_to_response(
+            self.get_context_data(form=self.form_class(), auth_token=token)
+        )
 
 
 class ProfileTokenDelete(LoginRequiredMixin, View):
-    def get(self, request):
-        Token.objects.filter(user=request.user).delete()
+    def post(self, request):
+        digest = request.POST["digest"]
+        models.AuthToken.objects.filter(digest=digest, user=self.request.user).delete()
         messages.success(request, "API token deleted successfully for " + request.user.username)
         return redirect("profile")
 

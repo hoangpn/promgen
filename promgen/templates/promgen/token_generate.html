@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load promgen %}
+
+{% block title %}
+Promgen / Auth Token
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <div>
+        <h1>{% translate "Generate new Token" %}</h1>
+    </div>
+</div>
+
+<ol class="breadcrumb">
+  <li><a href="/">Home</a></li>
+  <li><a href="{% url 'profile' %}">Profile</a></li>
+  <li class="active">Generate Token</li>
+</ol>
+
+<div class="panel panel-default">
+  <form method="post" action="{% url 'token-generate' %}">
+    {% csrf_token %}
+    <table class="table">
+    {{ form.as_table }}
+    </table>
+    <div class="panel-footer">
+      <button type="submit" class="btn btn-primary">
+        Generate
+      </button>
+    </div>
+  </form>
+</div>
+
+{% if auth_token %}
+  <div class="text-center">
+    <p class="text-warning">
+      A token has been generated successfully.
+      Please ensure you save this token as it cannot be displayed again.
+    </p>
+    <div class="form-group" style="display: flex; justify-content: center;">
+      <div class="input-group" style="width: 50%;">
+        <input
+          id="copy-to-clipboard-input"
+          type="text"
+          class="form-control text-center"
+          value="{{ auth_token }}"
+          readonly
+        >
+        <span class="input-group-btn">
+          <button
+            id="copy-to-clipboard-btn"
+            class="btn btn-primary"
+            type="button"
+            data-toggle="tooltip"
+            data-placement="top"
+            title="Copy to clipboard"
+          >
+            <span class="glyphicon glyphicon-copy"></span>
+          </button>
+        </span>
+      </div>
+    </div>
+    <div>
+      <a href="{% url 'profile' %}" class="btn btn-primary btn-sm">Back to Profile</a>
+      <a href="{% url 'api-v2:docs' %}" class="btn btn-primary btn-sm">Go to API Specification</a>
+    </div>
+  </div>
+{% endif %}
+
+{% endblock %}

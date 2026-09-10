@@ -8,11 +8,26 @@
       </a>
     </div>
 {% breadcrumb label="API v2" %}
-{% if not api_token %}
+{% if not api_tokens %}
 <p class="alert alert-warning" role="alert">
-  The API Token is not set. Please access the <a href="{% url 'profile' %}">Profile</a> page
-  to generate one.
+  No API Token. Please access the <a href="{% url 'profile' %}">Profile</a> page to generate one.
 </p>
+{% else %}
+<div class="panel panel-default">
+  <div class="panel-body">
+    <form id="api-token-form" class="form-inline" onsubmit="return false;">
+      <input
+        id="api-token-input"
+        type="text"
+        class="form-control"
+        placeholder="Enter API token"
+        required
+      />
+      <button id="api-token-button" class="btn btn-primary btn-sm">SET</button>
+      <span id="api-token-label" class="text-success ml-2"></span>
+    </form>
+  </div>
+</div>
 {% endif %}
 
 <div class="panel panel-default">
@@ -23,7 +38,7 @@
             allow-server-selection="false"
             api-key-location="header"
             api-key-name="Authorization"
-            api-key-value="Token {{ api_token }}"
+            api-key-value="Token"
             bg-color="#ffffff"
             mono-font="monospace"
             nav-bg-color="#f5f5f5"

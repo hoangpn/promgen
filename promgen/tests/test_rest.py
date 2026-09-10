@@ -10,7 +10,6 @@ from django.test import override_settings
 from django.urls import reverse
 from guardian.models import UserObjectPermission
 from guardian.shortcuts import assign_perm, remove_perm
-from rest_framework.authtoken.models import Token
 
 from promgen import models, plugins, rest, signals, tests
 from promgen.notification.email import NotificationEmail
@@ -36,7 +35,7 @@ class RestAPITest(tests.PromgenTest):
 
             if user:
                 user = User.objects.get(username=case["user"])
-                token = Token.objects.filter(user=user).first().key
+                token = models.AuthToken.objects.filter(user=user).first().token_key
                 for permission in permissions:
                     perm = permission["codename"]
                     app_label, model_name = permission["model"].split(".")
@@ -299,9 +298,9 @@ class RestAPITest(tests.PromgenTest):
     def test_rest_project__changing_owner(self):
         # Prepare test data
         admin = User.objects.get(username="admin")
-        admin_token = Token.objects.filter(user=admin).first().key
+        admin_token = models.AuthToken.objects.filter(user=admin).first().token_key
         user = User.objects.get(username="demo")
-        user_token = Token.objects.filter(user=user).first().key
+        user_token = models.AuthToken.objects.filter(user=user).first().token_key
         project = models.Project.objects.get(id=1)
         assign_perm("project_admin", user, project)
 
@@ -338,9 +337,9 @@ class RestAPITest(tests.PromgenTest):
     def test_rest_project__deleting_project(self):
         # Prepare test data
         admin = User.objects.get(username="admin")
-        admin_token = Token.objects.filter(user=admin).first().key
+        admin_token = models.AuthToken.objects.filter(user=admin).first().token_key
         user = User.objects.get(username="demo")
-        user_token = Token.objects.filter(user=user).first().key
+        user_token = models.AuthToken.objects.filter(user=user).first().token_key
 
         response = self.client.delete(
             reverse("api-v2:project-detail", kwargs={"id": 1}),
@@ -399,7 +398,7 @@ class RestAPITest(tests.PromgenTest):
     def test_rest_project__registering_farm(self):
         # Prepare test data
         user = User.objects.get(username="demo")
-        user_token = Token.objects.filter(user=user).first().key
+        user_token = models.AuthToken.objects.filter(user=user).first().token_key
         project = models.Project.objects.get(id=1)
         assign_perm("project_editor", user, project)
 
@@ -481,9 +480,9 @@ class RestAPITest(tests.PromgenTest):
     def test_rest_service__changing_owner(self):
         # Prepare test data
         admin = User.objects.get(username="admin")
-        admin_token = Token.objects.filter(user=admin).first().key
+        admin_token = models.AuthToken.objects.filter(user=admin).first().token_key
         user = User.objects.get(username="demo")
-        user_token = Token.objects.filter(user=user).first().key
+        user_token = models.AuthToken.objects.filter(user=user).first().token_key
         service = models.Service.objects.get(id=1)
         assign_perm("service_admin", user, service)
 
@@ -520,9 +519,9 @@ class RestAPITest(tests.PromgenTest):
     def test_rest_service__deleting_service(self):
         # Prepare test data
         admin = User.objects.get(username="admin")
-        admin_token = Token.objects.filter(user=admin).first().key
+        admin_token = models.AuthToken.objects.filter(user=admin).first().token_key
         user = User.objects.get(username="demo")
-        user_token = Token.objects.filter(user=user).first().key
+        user_token = models.AuthToken.objects.filter(user=user).first().token_key
 
         response = self.client.delete(
             reverse("api-v2:service-detail", kwargs={"id": 1}),
@@ -574,7 +573,7 @@ class RestAPITest(tests.PromgenTest):
     @override_settings(PROMGEN=tests.SETTINGS)
     def test_exception_handler(self):
         admin = User.objects.get(username="admin")
-        admin_token = Token.objects.filter(user=admin).first().key
+        admin_token = models.AuthToken.objects.filter(user=admin).first().token_key
 
         # Expected exception (rest_framework.ValidationError) returns 400 HTTP code
         # with the detail response.

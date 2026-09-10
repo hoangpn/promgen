@@ -61,8 +61,8 @@ INSTALLED_APPS = apps_from_setuptools + [
     "promgen",
     # Third Party
     "django_filters",
-    "rest_framework.authtoken",
     "rest_framework",
+    "knox",
     "social_django",
     "sri",
     "guardian",
@@ -191,7 +191,7 @@ if "SENTRY_DSN" in os.environ:
 
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
-        "rest_framework.authentication.TokenAuthentication",
+        "knox.auth.TokenAuthentication",
         "rest_framework.authentication.SessionAuthentication",
     ),
     "DEFAULT_PERMISSION_CLASSES": (
@@ -233,6 +233,15 @@ PROMGEN_EXPORTER_SCRAPE_TIMEOUT = env.int("PROMGEN_EXPORTER_SCRAPE_TIMEOUT", def
 
 # v2 API settings
 V2_API_LOGGING_ENABLED = env.bool("V2_API_LOGGING_ENABLED", default=True)
+
+# When set, Promgen will not allow the creation of API tokens with expiry greater than this setting.
+# None means unlimited.
+API_TOKEN_TTL_DAYS = env.int("API_TOKEN_TTL_DAYS", default=None)
+
+# Number of tokens a user is allowed to create. None means unlimited.
+API_TOKEN_MAX_QUOTA = env.int("API_TOKEN_MAX_QUOTA", default=None)
+
+KNOX_TOKEN_MODEL = "promgen.AuthToken"
 
 # Load overrides from PROMGEN to replace Django settings
 for k, v in PROMGEN.pop("django", {}).items():
