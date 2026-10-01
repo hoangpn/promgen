@@ -106,7 +106,7 @@ class AlertRuleSerializer(serializers.ModelSerializer):
         annotations["rule"] = resolve_domain("rule-detail", pk=obj.pk if obj.pk else 0)
 
         return {
-            "alert": obj.name,
+            "alerts": obj.name,
             "expr": macro.rulemacro(obj),
             "for": obj.duration,
             "labels": obj.labels,
