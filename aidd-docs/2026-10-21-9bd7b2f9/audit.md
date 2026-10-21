@@ -65,3 +65,12 @@
 - 2026-10-21T08:55:56+07:00 — Functional Design review requested. Complete approval prompt: “Please review `construction/uow-1-rest-v2-notifier-test-action/functional-design/`. The design uses safely classified failure summaries with a generic fallback and excludes raw exception text, secrets, and stack traces, consistent with the approved requirements. Reply `approve` to approve Functional Design and continue to NFR Requirements, or request changes that preserve the approved security constraint.”
 
 - User approval: “approve” — approved UOW-1 Functional Design and authorized continuation to NFR Requirements.
+
+- 2026-10-21T08:56:27+07:00 — UOW-1 NFR Requirements clarification requested. Complete prompt: “Please answer Question 1 in `construction/plans/uow-1-rest-v2-notifier-test-action-nfr-requirements-questions.md` and reply `done`. It asks whether the synchronous endpoint needs feature-specific latency/capacity or availability targets beyond existing deployment/provider defaults.”
+
+- User input: “done” — confirmed NFR Requirements answer was entered. Answer: A, no feature-specific targets; retain existing application and provider defaults. The answer is clear and consistent with the approved scope.
+- NFR Requirements deliverables generated for UOW-1.
+
+- 2026-10-21T08:57:31+07:00 — UOW-1 NFR Requirements review requested. Complete approval prompt: “Please review `construction/uow-1-rest-v2-notifier-test-action/nfr-requirements/`. The assessment records no feature-specific SLO, retains existing application/provider defaults, and reuses the existing Python/Django/DRF, permission, notification, and schema stack. Reply `approve` to approve NFR Requirements and continue to Code Generation, or request changes.”
+
+- User approval: “approve” — approved UOW-1 NFR Requirements and authorized continuation to Code Generation planning.

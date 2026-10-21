@@ -4,7 +4,7 @@
 - **Project Name**: Promgen
 - **Project Type**: Brownfield
 - **Start Date**: 2026-10-21
-- **Current Stage**: CONSTRUCTION - UOW-1 NFR Requirements planning
+- **Current Stage**: CONSTRUCTION - UOW-1 Code Planning
 
 ## Workspace State
 - **Existing Code**: Yes
@@ -38,7 +38,8 @@
 
 ## Construction Progress
 - [x] UOW-1 Functional Design (approved)
-- [ ] UOW-1 NFR Requirements (plan pending user input)
+- [x] UOW-1 NFR Requirements (approved)
+- [ ] UOW-1 Code Planning (in progress)
 - [ ] UOW-1 Code Generation
 - [ ] Build and Test
 
