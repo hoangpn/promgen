@@ -425,3 +425,28 @@ Are you ready to proceed to generation?
 - **Design boundary**: One shared per-target scrape-and-parse processor; authorization, target selection, URL formatting, pool/deadline behavior, status policy, exception mapping, ordering, and output serialization remain with the existing entry points.
 - **Approval prompt**: “Please review the Application Design deliverables for `exporter-scrape-reuse`. Reply `approve and continue` to approve the shared component boundary and proceed to Units Planning, or request changes.”
 - **Status**: Waiting for explicit approval.
+
+## 2026-10-21T11:38:22+07:00 — Application Design Approval
+- **User input (raw)**: `approve`
+- **Decision**: Approved the Application Design deliverables for `exporter-scrape-reuse`; continued to Units Planning.
+- **Deliverables**: `inception/application-design/exporter-scrape-reuse/`.
+- **Git checkpoint**: Commit `a28664b` (`aidd: inception/stage-6-application-design`); tag `aidd/inception/stage-6-application-design-exporter-scrape-reuse-2026-10-21-8c46f10e`.
+
+## 2026-10-21T11:40:19+07:00 — Units Planning Review Requested
+- **Plan**: `inception/plans/exporter-scrape-reuse-unit-of-work-plan.md`.
+- **Approval prompt**: “Please review the Unit of Work Plan for `exporter-scrape-reuse`. Reply `approve and continue` to approve the single-unit decomposition and generate its deliverables, or request changes.”
+- **Status**: Waiting for explicit plan approval.
+
+## 2026-10-21T11:41:18+07:00 — Units Planning Approval
+- **User input (raw)**: `approve`
+- **Decision**: Approved the single-unit decomposition and authorized generation of the unit deliverables.
+
+## 2026-10-21T11:41:18+07:00 — Units Generation Review Requested
+- **Deliverables**: `inception/application-design/exporter-scrape-reuse/unit-of-work.md`, `unit-of-work-dependency.md`, `unit-of-work-story-map.md`, `context-map.md`, and `unit-interfaces.md`.
+- **Approval prompt**: “Please review the Units Generation deliverables for `exporter-scrape-reuse`. Reply `approve and continue` to approve the single unit and proceed to Construction Functional Design, or request changes.”
+- **Status**: Waiting for explicit approval of the generated unit deliverables.
+
+## 2026-10-21T11:41:18+07:00 — Units Generation Approval
+- **User input (raw)**: `approve`
+- **Decision**: Approved the single unit and generated Units deliverables; continued to Construction Functional Design.
+- **Stage summary**: `inception/stage-summaries/stage-7-units-generation-exporter-scrape-reuse-summary.md`.

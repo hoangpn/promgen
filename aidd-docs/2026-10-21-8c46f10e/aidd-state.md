@@ -48,21 +48,39 @@
 - [ ] User Stories (recommended skip: behavior-preserving refactor)
 - [x] Workflow Planning (approved on 2026-10-21)
 - [x] Application Design (approved on 2026-10-21)
-- [ ] Units Planning (recommended execute)
-- [ ] Units Generation (recommended execute)
+- [x] Units Planning (approved on 2026-10-21)
+- [x] Units Generation (approved on 2026-10-21)
 
 ## Current Status
 - **Phase**: Inception (follow-up refactor scope)
 - **Current Unit**: `exporter-scrape-reuse` (proposed)
 - **Previous Construction Result**: Build and Test approved; full suite had 2 failures and 1 error. See `construction/build-and-test/build-and-test-summary.md`.
-- **Current Inception Stage**: Application Design complete; Units Planning next.
-- **Approved Unit of Work**: `exporter-test-api`
+- **Current Inception Stage**: Complete; Construction Functional Design next.
+- **Current Unit of Work**: `exporter-scrape-reuse` (one approved unit).
+- **Previous Unit of Work**: `exporter-test-api`
 
 ## 2026-10-21T11:38:22+07:00 — Application Design Approval
 - **User input (raw)**: `approve`
 - **Decision**: Approved the shared per-target scrape-and-parse boundary and caller-specific policy responsibilities; continued to Units Planning.
 - **Stage summary**: `inception/stage-summaries/stage-6-application-design-exporter-scrape-reuse-summary.md`.
-- **Status**: Application Design complete. Checkpoint pending.
+- **Status**: Application Design complete; checkpoint tagged as `aidd/inception/stage-6-application-design-exporter-scrape-reuse-2026-10-21-8c46f10e`.
+
+## 2026-10-21T11:40:19+07:00 — Units Planning Review Requested
+- **Plan**: `inception/plans/exporter-scrape-reuse-unit-of-work-plan.md`.
+- **Proposed decomposition**: One cohesive unit covering the shared helper, both caller integrations, and regression tests.
+- **Status**: Waiting for plan approval before generating unit deliverables.
+
+## 2026-10-21T11:41:18+07:00 — Units Planning Approval and Generation Review Requested
+- **User input (raw)**: `approve`
+- **Decision**: Approved the one-unit decomposition plan and authorized generation of its deliverables.
+- **Generated deliverables**: Unit definition, dependency matrix, requirements map, context map, and internal interface contract under `inception/application-design/exporter-scrape-reuse/`.
+- **Status**: Units Planning complete; Units Generation deliverables await review and approval.
+
+## 2026-10-21T11:41:18+07:00 — Units Generation Approval
+- **User input (raw)**: `approve`
+- **Decision**: Approved the single-unit decomposition and its generated deliverables; proceeded to Construction Functional Design.
+- **Stage summary**: `inception/stage-summaries/stage-7-units-generation-exporter-scrape-reuse-summary.md`.
+- **Status**: Inception complete for `exporter-scrape-reuse`; checkpoint pending.
 
 ## 2026-10-21T11:37:46+07:00 — Application Design Plan Approval and Deliverables Prepared
 - **User input (raw)**: `approve`
