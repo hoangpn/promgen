@@ -29,3 +29,10 @@
 - [x] User Stories (approved on 2026-10-21)
 - [x] Workflow Planning (approved on 2026-10-21)
 - [x] Application Design (approved on 2026-10-21)
+- [x] Units Planning (approved on 2026-10-21)
+- [x] Units Generation (approved on 2026-10-21)
+
+## Current Status
+- **Phase**: Inception complete
+- **Next Phase**: Construction
+- **Approved Unit of Work**: `exporter-test-api`
