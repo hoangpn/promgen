@@ -183,3 +183,5 @@ None.
 - Test execution is pending; the current environment lacks `drf_spectacular` in the active Python interpreter. No tests or lint were run.
 - Code Generation review requested after implementation, with code paths in `promgen/rest_v2.py`, `promgen/serializers.py`, and `promgen/tests/test_rest.py`, plus updated documentation.
 - User approval: “approve” — approved the implementation. Create the amendment checkpoint with tag `aidd/construction/uow-1-rest-v2-notifier-test-action/stage-5-code-generation-temporary-notifier-2026-10-21`; Build and Test verification remains pending.
+- Code Generation checkpoint created at commit `12dc32a`, tagged `aidd/construction/uow-1-rest-v2-notifier-test-action/stage-5-code-generation-temporary-notifier-2026-10-21`.
+- Stage completion summary generated at `construction/uow-1-rest-v2-notifier-test-action/stage-summaries/stage-5-code-generation-summary.md`; next stage is focused Build and Test verification.
