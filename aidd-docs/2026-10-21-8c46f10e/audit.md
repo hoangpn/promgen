@@ -356,4 +356,17 @@ Are you ready to proceed to generation?
 - **Decision**: Approved Code Generation and continued to Build and Test.
 - **Deliverables**: Implementation and endpoint tests recorded in `construction/exporter-test-api/code/code-generation-summary.md`.
 - **Verification at stage boundary**: Python byte compilation passed; `git diff --check` exited 0. Test suite execution deferred to Build and Test per the approved plan.
-- **Checkpoint**: Commit and tag `aidd/construction/exporter-test-api/stage-5-code-generation` to be created.
+- **Checkpoint**: Commit `dedfc81` (`aidd: construction/exporter-test-api/stage-5-code-generation`); tag `aidd/construction/exporter-test-api/stage-5-code-generation` created.
+
+## 2026-10-21T11:23:25+07:00 — Build and Test Stage
+- **Build status**: Django checks and migration check completed; static collection succeeded after setting `STATIC_ROOT=/private/tmp/promgen-static`. Three existing `promgen.W002` warnings note `/etc/prometheus` is not writable.
+- **Focused endpoint tests**: 37 passed, 0 failed/errors.
+- **Full test suite**: 100 run; 2 failed, 1 errored, 2 skipped. Failures are `RuleTest.test_write_new` and `RendererTests.test_global_rule` (rule ordering); `WebTests.test_routes` errors with SQLite `parser stack overflow` for `/host/example.com`. All three reproduce in isolation.
+- **Additional checks**: Ruff lint passed; Ruff format check passed (81 files); migration check reports no changes.
+- **Build and Test summary**: `construction/build-and-test/build-and-test-summary.md`.
+- **Outcome**: Stage execution complete; repository-wide suite is not green and this unit is not ready for Operations.
+
+## 2026-10-21 — Build and Test Approval
+- **User input (raw)**: `I approve. It's fine.`
+- **Decision**: Approved the Build and Test result with the documented full-suite failures; no request was made to investigate those unrelated test outcomes further.
+- **Checkpoint**: Commit `d1af9bb` (`aidd: construction/stage-6-build-and-test`). The standard tag already existed at `9a9ec54` and was preserved; session tag `aidd/construction/stage-6-build-and-test-2026-10-21-8c46f10e` created for this checkpoint.

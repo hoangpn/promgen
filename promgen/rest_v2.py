@@ -1116,9 +1116,7 @@ class ExporterViewSet(
                     r"\1[redacted]",
                     detail,
                 )
-                detail = re.sub(
-                    r"(?i)(authorization:\s*bearer\s+)[^\s]+", r"\1[redacted]", detail
-                )
+                detail = re.sub(r"(?i)(authorization:\s*bearer\s+)[^\s]+", r"\1[redacted]", detail)
                 return index, {
                     "host": host,
                     "status": "failure",
@@ -1127,8 +1125,7 @@ class ExporterViewSet(
 
         with concurrent.futures.ThreadPoolExecutor(max_workers=20) as executor:
             future_indices = {
-                executor.submit(scrape_one, index, host): index
-                for index, host in enumerate(hosts)
+                executor.submit(scrape_one, index, host): index for index, host in enumerate(hosts)
             }
             try:
                 for future in concurrent.futures.as_completed(

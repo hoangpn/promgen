@@ -4,7 +4,7 @@
 - **Project Name**: promgen
 - **Project Type**: Brownfield
 - **Start Date**: 2026-10-21T10:21:38+07:00
-- **Current Stage**: CONSTRUCTION - Build and Test
+- **Current Stage**: CONSTRUCTION - Build and Test (approved; full-suite failures remain)
 
 ## Workspace State
 - **Existing Code**: Yes
@@ -39,10 +39,10 @@
 - [ ] Infrastructure Design (skipped per approved execution plan)
 - [x] Code Planning (approved on 2026-10-21)
 - [x] Code Generation (approved on 2026-10-21)
-- [ ] Build and Test
+- [x] Build and Test (approved on 2026-10-21; failures documented)
 
 ## Current Status
 - **Phase**: Construction
 - **Current Unit**: `exporter-test-api`
-- **Current Construction Stage**: Build and Test
+- **Current Construction Stage**: Build and Test approved; full suite has 2 failures and 1 error. Not ready for Operations; see `construction/build-and-test/build-and-test-summary.md`.
 - **Approved Unit of Work**: `exporter-test-api`

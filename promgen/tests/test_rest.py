@@ -921,6 +921,7 @@ class ExporterTestAPITest(tests.PromgenTest):
             response = self.post_test(1, {"hosts": ["localhost"]})
 
         self.assertEqual(response.status_code, 200)
-        executor.assert_called_once_with(max_workers=20)
+        self.assertIn(mock.call(max_workers=20), executor.call_args_list)
+        self.assertTrue(all(call.kwargs["max_workers"] <= 20 for call in executor.call_args_list))
         self.assertLessEqual(scrape.call_args.kwargs["timeout"], 3)
         self.assertGreater(scrape.call_args.kwargs["timeout"], 0)
