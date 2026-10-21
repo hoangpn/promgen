@@ -168,3 +168,40 @@ Options:
 ## 2026-10-21T10:49:32+07:00 — Workflow Planning Approval
 - **User input (raw)**: `approve`
 - **Decision**: Approved the execution plan and continued to Application Design.
+
+## 2026-10-21T10:51:33+07:00 — Workflow Planning Checkpoint
+- **Checkpoint branch**: `aidd/promgen`
+- **Commit**: `e992609` (`aidd: inception/stage-5-workflow-planning`)
+- **Tag**: `aidd/inception/stage-5-workflow-planning-2026-10-21-8c46f10e`; the standard tag already existed and was preserved.
+- **Continuation**: User approved and continued without context compression.
+
+## 2026-10-21T10:52:22+07:00 — Application Design Review Requested
+- **Stage 5 checkpoint**: commit `e992609`; session tag `aidd/inception/stage-5-workflow-planning-2026-10-21-8c46f10e` (standard tag preserved because it already existed).
+- **Design plan**: No unresolved stakeholder design questions; generated the approved component and service design deliverables.
+- **Approval prompt presented**:
+
+# 🏗️ Application Design Complete
+
+- The exporter test is designed as a detail POST action on the existing `ExporterViewSet`, reusing its established reserved-ID `0` pattern.
+- Saved and temporary paths share an orchestration boundary, request/result contracts, and existing scrape execution protections.
+- Saved exporters use an explicit viewer/editor/admin permission check; temporary tests remain authenticated without project/service object-level authorization.
+- No new deployable service, model, database schema, or infrastructure component is proposed.
+
+> **📋 REVIEW REQUIRED:**
+> Please review the application design deliverables: `aidd-docs/inception/application-design/`
+> - [components.md](aidd-docs/2026-10-21-8c46f10e/inception/application-design/components.md)
+> - [component-methods.md](aidd-docs/2026-10-21-8c46f10e/inception/application-design/component-methods.md)
+> - [services.md](aidd-docs/2026-10-21-8c46f10e/inception/application-design/services.md)
+> - [component-dependency.md](aidd-docs/2026-10-21-8c46f10e/inception/application-design/component-dependency.md)
+
+> **🚀 WHAT’S NEXT?**
+>
+> **Options:**
+>
+> 🔧 **Request changes** — Ask for revisions to the application design
+> ✅ **Approve and continue** — Approve the design and proceed to Units Generation
+
+
+## 2026-10-21T10:54:08+07:00 — Application Design Approval
+- **User input (raw)**: `approve`
+- **Decision**: Approved the Application Design and continued to Units Generation.
