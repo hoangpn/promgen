@@ -1,5 +1,6 @@
 # Copyright (c) 2018 LINE Corporation
 # These sources are released under the terms of the MIT license: see LICENSE
+import concurrent.futures
 import json
 from unittest import mock
 
@@ -10,6 +11,7 @@ from django.test import override_settings
 from django.urls import reverse
 from guardian.models import UserObjectPermission
 from guardian.shortcuts import assign_perm, remove_perm
+from requests.exceptions import Timeout
 from requests.models import Response
 
 from promgen import models, plugins, rest, signals, tests
@@ -729,3 +731,197 @@ class RestAPITest(tests.PromgenTest):
         )
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.json(), {"name": ["This field may not be blank."]})
+
+
+class ExporterTestAPITest(tests.PromgenTest):
+    def setUp(self):
+        self.user = User.objects.get(username="demo")
+
+    def post_test(self, exporter_id, payload, authenticated=True):
+        url = reverse("api-v2:exporter-test", kwargs={"id": exporter_id})
+        request = {
+            "data": json.dumps(payload),
+            "content_type": "application/json",
+        }
+        if authenticated:
+            request["HTTP_AUTHORIZATION"] = "Token demo_token"
+        return self.client.post(url, **request)
+
+    @staticmethod
+    def scrape_response(status=200, text="test_metric 1\n"):
+        response = mock.Mock(spec=Response)
+        response.status_code = status
+        response.text = text
+        return response
+
+    def grant_project_viewer(self, project_id=1):
+        assign_perm("project_viewer", self.user, models.Project.objects.get(pk=project_id))
+
+    @mock.patch("promgen.rest_v2.util.scrape")
+    def test_saved_exporter_uses_stored_config_and_explicit_targets(self, scrape):
+        self.grant_project_viewer()
+        scrape.return_value = self.scrape_response()
+        exporter = models.Exporter.objects.get(pk=1)
+        original = (exporter.scheme, exporter.port, exporter.path)
+
+        response = self.post_test(
+            1,
+            {
+                "hosts": ["127.0.0.1"],
+                "scheme": "https",
+                "port": 9443,
+                "path": "/override",
+            },
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()["status"], "success")
+        self.assertEqual(response.json()["results"][0]["host"], "127.0.0.1")
+        self.assertEqual(response.json()["results"][0]["status_code"], 200)
+        self.assertEqual(response.json()["results"][0]["metric_count"], 1)
+        self.assertEqual(response.json()["results"][0]["sample_count"], 1)
+        scrape.assert_called_once()
+        self.assertEqual(scrape.call_args.args[0], "http://127.0.0.1:9100/metrics")
+        self.assertFalse(scrape.call_args.kwargs["allow_redirects"])
+        exporter.refresh_from_db()
+        self.assertEqual((exporter.scheme, exporter.port, exporter.path), original)
+
+    @mock.patch("promgen.rest_v2.util.scrape")
+    def test_saved_exporter_defaults_to_farm_hosts(self, scrape):
+        self.grant_project_viewer()
+        scrape.return_value = self.scrape_response()
+
+        response = self.post_test(1, {})
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()["results"][0]["host"], "example.com")
+        self.assertEqual(scrape.call_args.args[0], "http://example.com:9100/metrics")
+
+    @mock.patch("promgen.rest_v2.util.scrape")
+    def test_temporary_exporter_defaults_path_without_object_permission(self, scrape):
+        scrape.return_value = self.scrape_response()
+        exporter_count = models.Exporter.objects.count()
+
+        response = self.post_test(
+            0,
+            {"hosts": ["localhost"], "scheme": "https", "port": 9443},
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()["status"], "success")
+        self.assertEqual(scrape.call_args.args[0], "https://localhost:9443/metrics")
+        self.assertEqual(models.Exporter.objects.count(), exporter_count)
+
+    @mock.patch("promgen.rest_v2.util.scrape")
+    def test_temporary_request_without_hosts_is_rejected_before_scrape(self, scrape):
+        response = self.post_test(0, {"scheme": "http", "port": 9100})
+
+        self.assertEqual(response.status_code, 400)
+        scrape.assert_not_called()
+
+    @mock.patch("promgen.rest_v2.util.scrape")
+    def test_invalid_explicit_host_is_rejected_before_scrape(self, scrape):
+        response = self.post_test(
+            0,
+            {"hosts": ["localhost/path"], "scheme": "http", "port": 9100},
+        )
+
+        self.assertEqual(response.status_code, 400)
+        scrape.assert_not_called()
+
+    @mock.patch("promgen.rest_v2.util.scrape")
+    @override_settings(PROMGEN_EXPORTER_TEST_MAX_HOSTS=1)
+    def test_over_limit_explicit_hosts_are_rejected_before_scrape(self, scrape):
+        response = self.post_test(
+            0,
+            {"hosts": ["localhost", "127.0.0.1"], "scheme": "http", "port": 9100},
+        )
+
+        self.assertEqual(response.status_code, 400)
+        scrape.assert_not_called()
+
+    @mock.patch("promgen.rest_v2.util.scrape")
+    @override_settings(PROMGEN_EXPORTER_TEST_MAX_HOSTS=0)
+    def test_oversized_default_farm_is_rejected_before_scrape(self, scrape):
+        self.grant_project_viewer()
+
+        response = self.post_test(1, {})
+
+        self.assertEqual(response.status_code, 400)
+        scrape.assert_not_called()
+
+    @mock.patch("promgen.rest_v2.util.scrape")
+    def test_empty_default_farm_is_rejected_before_scrape(self, scrape):
+        self.grant_project_viewer(project_id=2)
+
+        response = self.post_test(2, {})
+
+        self.assertEqual(response.status_code, 400)
+        scrape.assert_not_called()
+
+    @mock.patch("promgen.rest_v2.util.scrape")
+    def test_missing_exporter_returns_not_found(self, scrape):
+        response = self.post_test(999999, {})
+
+        self.assertEqual(response.status_code, 404)
+        scrape.assert_not_called()
+
+    @mock.patch("promgen.rest_v2.util.scrape")
+    def test_saved_exporter_requires_saved_object_permission(self, scrape):
+        response = self.post_test(1, {"hosts": ["localhost"]})
+
+        self.assertEqual(response.status_code, 403)
+        scrape.assert_not_called()
+
+    @mock.patch("promgen.rest_v2.util.scrape")
+    def test_both_modes_require_authentication(self, scrape):
+        response = self.post_test(
+            0,
+            {"hosts": ["localhost"], "scheme": "http", "port": 9100},
+            authenticated=False,
+        )
+
+        self.assertIn(response.status_code, (401, 403))
+        scrape.assert_not_called()
+
+    @mock.patch("promgen.rest_v2.util.scrape")
+    def test_redirect_and_scrape_error_are_per_host_failures(self, scrape):
+        self.grant_project_viewer()
+
+        def scrape_target(url, **kwargs):
+            if "localhost" in url:
+                return self.scrape_response(status=302, text="")
+            raise Timeout("https://user:password@target/metrics?token=abc")
+
+        scrape.side_effect = scrape_target
+
+        response = self.post_test(1, {"hosts": ["localhost", "127.0.0.1"]})
+
+        self.assertEqual(response.status_code, 200)
+        body = response.json()
+        self.assertEqual(body["status"], "failure")
+        self.assertEqual([item["host"] for item in body["results"]], ["localhost", "127.0.0.1"])
+        self.assertIn("HTTP status 302", body["results"][0]["error"])
+        self.assertNotIn("password", body["results"][1]["error"])
+        self.assertNotIn("token=abc", body["results"][1]["error"])
+        self.assertTrue(
+            all(call.kwargs["allow_redirects"] is False for call in scrape.call_args_list)
+        )
+
+    @mock.patch("promgen.rest_v2.util.scrape")
+    @override_settings(PROMGEN_EXPORTER_SCRAPE_TIMEOUT=3)
+    def test_scrapes_use_existing_timeout_and_twenty_worker_bound(self, scrape):
+        self.grant_project_viewer()
+        scrape.return_value = self.scrape_response()
+
+        with mock.patch(
+            "promgen.rest_v2.concurrent.futures.ThreadPoolExecutor",
+            wraps=concurrent.futures.ThreadPoolExecutor,
+        ) as executor:
+            response = self.post_test(1, {"hosts": ["localhost"]})
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(mock.call(max_workers=20), executor.call_args_list)
+        self.assertTrue(all(call.kwargs["max_workers"] <= 20 for call in executor.call_args_list))
+        self.assertLessEqual(scrape.call_args.kwargs["timeout"], 3)
+        self.assertGreater(scrape.call_args.kwargs["timeout"], 0)

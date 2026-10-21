@@ -22,3 +22,4 @@ docker/promgen.rule
 docker/blackbox.json
 docker/mysql_data
 docker/prom_data
+.worktrees/

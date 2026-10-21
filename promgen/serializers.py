@@ -1,7 +1,10 @@
 import collections
+import ipaddress
+import re
 from functools import lru_cache
 
 from dateutil import parser
+from django.conf import settings as django_settings
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.core.validators import MaxValueValidator
@@ -318,6 +321,90 @@ class ExporterRetrieveSerializer(serializers.ModelSerializer):
         model = models.Exporter
         fields = "__all__"
         read_only_fields = ("job", "port", "path", "scheme", "project")
+
+
+def validate_exporter_test_host(value):
+    """Validate a host value without allowing it to change a scrape URL's authority."""
+    if not value or value != value.strip() or any(char in value for char in "/?#@\\%"):
+        raise serializers.ValidationError("Enter a valid hostname or IP address.")
+
+    if len(value) > 253:
+        raise serializers.ValidationError("Enter a valid hostname or IP address.")
+
+    try:
+        ipaddress.ip_address(value)
+        return value
+    except ValueError:
+        pass
+
+    hostname = value[:-1] if value.endswith(".") else value
+    try:
+        hostname = hostname.encode("idna").decode("ascii")
+    except UnicodeError as error:
+        raise serializers.ValidationError("Enter a valid hostname or IP address.") from error
+
+    label_pattern = re.compile(r"^[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?$")
+    if not hostname or any(not label_pattern.fullmatch(label) for label in hostname.split(".")):
+        raise serializers.ValidationError("Enter a valid hostname or IP address.")
+    return value
+
+
+class ExporterTestRequestSerializer(serializers.Serializer):
+    hosts = serializers.ListField(
+        child=serializers.CharField(trim_whitespace=False),
+        required=False,
+        allow_empty=False,
+        help_text=(
+            "Optional for saved exporters, required for exporter ID 0; the configured maximum "
+            f"defaults to {django_settings.PROMGEN_EXPORTER_TEST_MAX_HOSTS}."
+        ),
+    )
+    scheme = serializers.ChoiceField(choices=("http", "https"), required=False)
+    port = serializers.IntegerField(min_value=1, max_value=65535, required=False)
+    path = serializers.CharField(required=False, allow_blank=False, trim_whitespace=False)
+
+    def validate(self, attrs):
+        maximum = django_settings.PROMGEN_EXPORTER_TEST_MAX_HOSTS
+        hosts = attrs.get("hosts")
+        if hosts is not None:
+            if len(hosts) > maximum:
+                raise serializers.ValidationError(
+                    {"hosts": f"At most {maximum} hosts may be tested in one request."}
+                )
+            attrs["hosts"] = [validate_exporter_test_host(host) for host in hosts]
+
+        if str(self.context.get("exporter_id")) == "0":
+            required = [name for name in ("hosts", "scheme", "port") if name not in attrs]
+            if required:
+                raise serializers.ValidationError(
+                    {name: "This field is required for a temporary exporter." for name in required}
+                )
+            attrs.setdefault("path", "/metrics")
+
+        path = attrs.get("path")
+        if path is not None and (
+            not path.startswith("/")
+            or path.startswith("//")
+            or any(char in path for char in "?#\\\r\n\x00")
+        ):
+            raise serializers.ValidationError(
+                {"path": "Enter an absolute path without a query or fragment."}
+            )
+        return attrs
+
+
+class HostTestResultSerializer(serializers.Serializer):
+    host = serializers.CharField()
+    status = serializers.ChoiceField(choices=("success", "failure"))
+    status_code = serializers.IntegerField(required=False)
+    metric_count = serializers.IntegerField(required=False)
+    sample_count = serializers.IntegerField(required=False)
+    error = serializers.CharField(required=False, allow_blank=True)
+
+
+class ExporterTestResultSerializer(serializers.Serializer):
+    status = serializers.ChoiceField(choices=("success", "failure"))
+    results = HostTestResultSerializer(many=True, allow_empty=False)
 
 
 class URLSerializer(serializers.ModelSerializer):

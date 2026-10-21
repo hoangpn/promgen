@@ -27,6 +27,17 @@ API tokens with expiry greater than this setting. The default is None, which mea
 on the Django Admin Site. The Promgen Admin can create tokens on the Django Admin Site without restrictions.*
 
 
+PROMGEN_EXPORTER_TEST_MAX_HOSTS
+-------------------------------
+[Integer | default = 50]
+
+Maximum number of hosts that can be tested in one request to
+``POST /rest/v2/exporters/{exporter_id}/test``. Set the ``PROMGEN_EXPORTER_TEST_MAX_HOSTS``
+environment variable to change the limit. If the selected host count exceeds this limit, the API
+returns HTTP 400 before starting any scrapes. This applies to both explicit host lists and the
+default hosts selected for a saved exporter.
+
+
 V2_API_LOGGING_ENABLED
 -----------------------
 [Boolean | default = True]
