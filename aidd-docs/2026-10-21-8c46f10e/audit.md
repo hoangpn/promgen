@@ -285,3 +285,29 @@ Are you ready to proceed to generation?
 - **User input (raw)**: `approve`
 - **Decision**: Approved Functional Design for `exporter-test-api` and continued to NFR Requirements.
 - **Clarification incorporated**: Empty saved-exporter farm with omitted hosts returns HTTP 400 asking for an explicit non-empty list; no scrape occurs.
+- **Checkpoint**: Commit `bb7ebc6` (`aidd: construction/exporter-test-api/stage-1-functional-design`); tag `aidd/construction/exporter-test-api/stage-1-functional-design` created.
+
+## 2026-10-21T11:04:06+07:00 — NFR Requirements Started
+- **Unit**: `exporter-test-api`
+- **Analysis**: Confirmed the existing Django REST Framework/`requests` stack, a 20-worker scrape executor, and `PROMGEN_EXPORTER_SCRAPE_TIMEOUT` defaulting to 25 seconds.
+- **Questions**: Four file-based questions recorded for endpoint workload/latency, additional abuse controls, redirect policy, and operational visibility.
+- **Status**: Waiting for completed answers before drafting NFR deliverables.
+
+## 2026-10-21T11:05:00+07:00 — NFR Clarification Requested
+- **User input (raw)**: `done` (NFR questions file completed).
+- **Analysis**: Workload and abuse-control answers (“No need to care”) did not establish whether the approved bounds were the intended requirements; redirect and observability answers were blank.
+- **Follow-up**: Created `construction/plans/exporter-test-api-nfr-clarification-questions.md` with four focused resolution questions.
+- **Status**: NFR deliverables remain pending until all clarifications are answered.
+
+## 2026-10-21T11:07:44+07:00 — NFR Requirements Drafted
+- **User input (raw)**: `done` (clarification file completed).
+- **Clarification answers**: No additional workload/latency target; no endpoint-specific rate limit; do not follow redirects; use API response and existing application logs without new metrics or persistent records.
+- **Deliverables**: `construction/exporter-test-api/nfr-requirements/nfr-requirements.md` and `tech-stack-decisions.md`.
+- **Consistency note**: Documented the existing 25-second scrape collection timeout without claiming hard socket cancellation; retained the approved 20-worker limit and default 50-host cap.
+- **Status**: NFR Requirements deliverables are ready for review; approval pending.
+
+## 2026-10-21T11:08:21+07:00 — NFR Requirements Approval
+- **User input (raw)**: `approve`
+- **Decision**: Approved NFR Requirements and continued to NFR Design.
+- **Checkpoint**: Pending creation of commit and tag `aidd/construction/exporter-test-api/stage-2-nfr-requirements`.
+- **Stage summary**: `construction/exporter-test-api/stage-summaries/stage-2-nfr-requirements-summary.md`.
