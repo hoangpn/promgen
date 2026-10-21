@@ -4,7 +4,7 @@
 
 | Story | Unit of Work | Coverage |
 |---|---|---|
-| US-1: Test an Exporter and Inspect Per-Host Outcomes | `exporter-test-api` | Scenarios 1–13: saved and temporary modes, host selection and limits, authentication and authorization, result aggregation, API semantics, missing exporter handling, and existing scrape bounds |
+| US-1: Test an Exporter and Inspect Per-Host Outcomes | `exporter-test-api` | Scenarios 1–14: saved and temporary modes, host selection and limits, authentication and authorization, result aggregation, API semantics, missing exporter handling, existing scrape bounds, and empty-farm validation |
 
 ## Acceptance scenario mapping
 
@@ -23,6 +23,7 @@
 | 11. HTTP 200 meaning | Document that 200 means the test ran; outcomes are in the body |
 | 12. Saved exporter missing | Return a suitable 4xx response without running scrapes |
 | 13. Existing scrape bounds | Preserve maximum concurrency of 20 and configured scrape timeout |
+| 14. Saved farm has no hosts and hosts are omitted | Reject before scraping with HTTP 400 asking for an explicit, non-empty host list |
 
 ## Coverage check
 

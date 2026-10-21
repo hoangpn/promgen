@@ -2,7 +2,7 @@
 
 ## Key Decisions
 - Decomposed PROMGENDEV-275 into one logical unit, `exporter-test-api`, within the existing brownfield Promgen application.
-- Assigned US-1 and all 13 acceptance scenarios to this unit.
+- Assigned US-1 and all 14 acceptance scenarios to this unit.
 - Preserved existing ownership of exporter, project, farm, and host data; the feature does not persist temporary inputs or test results.
 - Approved the context map and defined an external REST contract; there are no inter-unit interfaces.
 - No base repository plan is applicable to this brownfield project.
@@ -26,5 +26,5 @@
 ## Numeric Summary
 - Units of Work: 1
 - User stories assigned: 1
-- Acceptance scenarios mapped: 13
+- Acceptance scenarios mapped: 14
 - Inter-unit interfaces: 0

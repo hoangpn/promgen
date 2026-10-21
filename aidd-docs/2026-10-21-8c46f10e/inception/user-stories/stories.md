@@ -15,9 +15,9 @@
 **Then** Promgen uses the saved exporter configuration  
 **And** request data does not override or modify the saved exporter attributes.
 
-#### Scenario 2: Use all farm hosts when the saved exporter's farm is within the configured limit
+#### Scenario 2: Use all farm hosts when the saved exporter's farm has hosts within the configured limit
 
-**Given** the saved exporter's project farm has no more than the configured host limit  
+**Given** the saved exporter's project farm has at least one host and no more than the configured host limit
 **And** the request does not include a host list  
 **When** the caller runs the test  
 **Then** Promgen tests all hosts in that farm.
@@ -109,6 +109,20 @@
 **Then** it preserves the existing maximum of 20 concurrent host scrapes  
 **And** it applies the configured scrape timeout.
 
+#### Scenario 14: Reject an omitted host list when the saved exporter's farm is empty
+
+**Given** the saved exporter's project farm has no hosts
+
+**And** the request does not include a host list
+
+**When** the caller runs the test
+
+**Then** Promgen returns HTTP 400
+
+**And** the response asks the caller to provide an explicit, non-empty host list
+
+**And** Promgen does not run a scrape.
+
 ### Requirement Traceability
 
 | Story / scenario | Requirements |
@@ -122,6 +136,7 @@
 | US-1, Scenario 11 | FR-18 |
 | US-1, Scenario 12 | FR-15 |
 | US-1, Scenario 13 | NFR-3 |
+| US-1, Scenario 14 | FR-19 |
 
 ## INVEST Review
 

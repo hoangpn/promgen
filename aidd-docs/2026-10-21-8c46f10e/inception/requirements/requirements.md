@@ -20,7 +20,7 @@ Provide an authenticated v2 API operation that tests an exporter against one or 
 - **FR-4**: For a temporary exporter (`ID=0`), accept a non-empty list of host names and scrape configuration containing scheme, port, and path. Do not persist the temporary exporter. Default an omitted path to `/metrics`, consistent with the existing scrape behavior.
 
 ### Host selection and request limits
-- **FR-5**: For a persisted exporter, an omitted host list means test all hosts in the exporter's project's farm, provided the total does not exceed the configured maximum.
+- **FR-5**: For a persisted exporter, an omitted host list means test all hosts in the exporter's project's farm when the farm has at least one host and the total does not exceed the configured maximum.
 - **FR-6**: An optional host list identifies targets by host name. Do not require a supplied host name to be a member of the exporter's farm.
 - **FR-7**: Set the configurable maximum number of hosts per request to 50 by default. Reject a request with HTTP 400 if its explicit list exceeds the configured maximum.
 - **FR-8**: If the persisted exporter's farm has more hosts than the configured maximum and the request omits the host list, reject with HTTP 400 and explain that the caller must provide an explicit host list within the limit.
@@ -38,6 +38,7 @@ Provide an authenticated v2 API operation that tests an exporter against one or 
 - **FR-16**: Return a structured response containing an overall test status and a list of per-host results. Each host result includes the host, scrape status, and metric details on success or error details on failure.
 - **FR-17**: Set the overall test status to success only when every host result succeeds; otherwise set it to failure. A failed test still uses HTTP 200 if the scrape operation ran.
 - **FR-18**: Document in the API endpoint description that HTTP 200 means the test operation ran and that scrape outcomes are reported in the response body.
+- **FR-19**: If a persisted exporter's farm has no hosts and the request omits the host list, reject with HTTP 400 and ask the caller to provide an explicit, non-empty host list; do not run a scrape.
 
 ## Non-Functional Requirements and Constraints
 - **NFR-1 — Bounded work**: The default maximum is 50 hosts per request and is configurable through application settings.
@@ -50,12 +51,13 @@ Provide an authenticated v2 API operation that tests an exporter against one or 
 1. A caller can invoke the v2 test operation for a saved exporter and the scrape uses the saved exporter configuration even if conflicting exporter attributes are included in the request.
 2. A caller can invoke the operation with ID `0`, an explicit host list, and temporary scrape settings; the temporary settings are not persisted.
 3. The endpoint rejects a temporary request without hosts and rejects any explicit host list over the configured maximum with HTTP 400.
-4. When a saved exporter's farm is within the configured limit, omitting hosts tests all farm hosts. When the farm exceeds the configured limit, omitting hosts returns HTTP 400 with guidance to provide a bounded host list.
-5. Host names in an explicit list are not rejected solely because they are outside the exporter's farm. Valid private and loopback host targets are accepted.
-6. Persisted exporter tests enforce project/service viewer, editor, or admin permissions. Temporary ID `0` tests require API authentication but do not perform a project/service object-level permission check.
-7. A completed scrape attempt returns HTTP 200 and structured per-host outcomes, including when targets fail. The overall status is success only when all target results succeed.
-8. Invalid input, missing resources, authentication/authorization failures, and host-limit violations return suitable 4xx responses.
-9. The API schema explains the meaning of HTTP 200 and the response body outcomes.
+4. When a saved exporter's farm has at least one host and is within the configured limit, omitting hosts tests all farm hosts. When the farm exceeds the configured limit, omitting hosts returns HTTP 400 with guidance to provide a bounded host list.
+5. When a saved exporter's farm has no hosts and hosts are omitted, the endpoint returns HTTP 400 asking for an explicit, non-empty host list and runs no scrape.
+6. Host names in an explicit list are not rejected solely because they are outside the exporter's farm. Valid private and loopback host targets are accepted.
+7. Persisted exporter tests enforce project/service viewer, editor, or admin permissions. Temporary ID `0` tests require API authentication but do not perform a project/service object-level permission check.
+8. A completed scrape attempt returns HTTP 200 and structured per-host outcomes, including when targets fail. The overall status is success only when all target results succeed.
+9. Invalid input, missing resources, authentication/authorization failures, and host-limit violations return suitable 4xx responses.
+10. The API schema explains the meaning of HTTP 200 and the response body outcomes.
 
 ## Assumptions and Open Implementation Details
 - A persisted exporter’s default hosts come from its associated project farm.

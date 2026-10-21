@@ -4,7 +4,7 @@
 - **Project Name**: promgen
 - **Project Type**: Brownfield
 - **Start Date**: 2026-10-21T10:21:38+07:00
-- **Current Stage**: INCEPTION - Units Generation
+- **Current Stage**: CONSTRUCTION - exporter-test-api NFR Requirements
 
 ## Workspace State
 - **Existing Code**: Yes
@@ -32,7 +32,17 @@
 - [x] Units Planning (approved on 2026-10-21)
 - [x] Units Generation (approved on 2026-10-21)
 
+## Construction Progress — exporter-test-api
+- [x] Functional Design (approved on 2026-10-21)
+- [ ] NFR Requirements
+- [ ] NFR Design
+- [ ] Infrastructure Design (skipped per approved execution plan)
+- [ ] Code Planning
+- [ ] Code Generation
+- [ ] Build and Test
+
 ## Current Status
-- **Phase**: Inception complete
-- **Next Phase**: Construction
+- **Phase**: Construction
+- **Current Unit**: `exporter-test-api`
+- **Current Construction Stage**: NFR Requirements
 - **Approved Unit of Work**: `exporter-test-api`

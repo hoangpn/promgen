@@ -36,7 +36,7 @@ graph TD
 1. DRF authenticates the API client.
 2. The test action resolves the saved exporter or recognizes ID `0`.
 3. Saved mode loads saved attributes and checks project/service access. Temporary mode validates request-supplied scrape settings and requires hosts.
-4. The action validates host selection against the configured maximum. If hosts are omitted in saved mode, it obtains all hosts from the exporter's project farm and rejects an oversized default set.
+4. The action validates host selection against the configured maximum. If hosts are omitted in saved mode, it obtains all hosts from the exporter's project farm; it rejects an empty default set with HTTP 400 asking for an explicit, non-empty list, and rejects an oversized default set with HTTP 400. Both rejections happen before scraping.
 5. The scrape utility contacts each target using existing concurrency and timeout settings and parses Prometheus metrics.
 6. The action creates one result per host and aggregate success only when all results succeed.
 7. The API returns HTTP 200 after a test runs; pre-execution failures use 4xx responses.

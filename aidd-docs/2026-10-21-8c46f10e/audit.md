@@ -245,3 +245,43 @@ Are you ready to proceed to generation?
 - **Approval prompt presented**: “Review the complete Unit of Work set: unit definition, dependencies, story map, context map, and REST interface contract. Reply ‘approve and continue’ to approve Units Generation and proceed to the Construction Phase, or request changes.”
 - **User input (raw)**: `approve`
 - **Decision**: Approved Units Generation and completed the Inception Phase.
+- **Checkpoint**: Commit `c4b6abe` (`aidd: inception/stage-7-units-generation`); session tag `aidd/inception/stage-7-units-generation-2026-10-21-8c46f10e` created. The standard tag existed already and was preserved.
+
+## 2026-10-21T10:57:31+07:00 — Construction Functional Design Started
+- **Unit**: `exporter-test-api`
+- **Execution plan**: Functional Design is marked EXECUTE.
+- **Analysis basis**: Approved unit/story artifacts and current Promgen REST permission, exporter model, scrape utility, and web scrape implementation.
+- **Clarification question**: Behavior was requested for a saved exporter whose farm has zero hosts. The response metric summary follows the existing scrape behavior (`status_code`, `metric_count`, `sample_count`).
+
+## Construction Functional Design Clarification
+- **User input (raw)**: `A`
+- **Decision**: If a saved exporter has no farm hosts and `hosts` is omitted, return HTTP 400 asking for an explicit non-empty host list; do not start a scrape.
+- **Functional Design update**: Recorded in `business-logic-model.md` and `business-rules.md`.
+
+## Docs Sync (Cascade)
+**Timestamp**: 2026-10-21T11:01:27+07:00
+**Sync mode**: Cascade
+**cascade_id**: aidd-docs-sync-cascade-2026-10-21T11-01-27
+**Origin stage**: Construction — Functional Design
+**Origin document**: `construction/exporter-test-api/functional-design/business-rules.md`
+**Feedback content**: User selected option A for the previously unspecified empty-farm case: reject before scraping with HTTP 400 and require an explicit non-empty host list.
+**Content before correction**: Functional design did not specify what to do when a saved exporter's farm had zero hosts and the request omitted `hosts`.
+**Content after correction**: The API returns HTTP 400 requesting an explicit non-empty host list and performs no scrape.
+**Cascade-corrected documents**:
+| Document | Corrected Location | Before | After |
+|---|---|---|---|
+| `inception/requirements/requirements.md` | FR-5, FR-19, acceptance criterion 4, new criterion 5 | Default all-host behavior did not distinguish an empty farm | FR-5 requires at least one default host; FR-19 and criterion 5 define the empty-farm HTTP 400 behavior |
+| `inception/user-stories/stories.md` | US-1 acceptance scenarios and traceability | No zero-host farm scenario | Added Scenario 14 and mapped it to FR-19 |
+| `inception/application-design/component-methods.md` | `resolve_exporter_test` behavior | No empty-target rejection defined | Rejects an empty implicit host set before scraping |
+| `inception/application-design/component-dependency.md` | Data flow step 4 | Only oversized default sets were rejected | Empty and oversized default sets are both rejected before scraping |
+| `inception/application-design/unit-of-work-story-map.md` | Coverage and scenario mapping | Scenarios 1–13 | Scenario 14 assigned to `exporter-test-api` |
+| `inception/application-design/unit-interfaces.md` | Request and error behavior | No empty-farm response documented | Documents HTTP 400, explicit non-empty list, and no scrape |
+| `inception/stage-summaries/stage-7-units-generation-summary.md` | Key decisions and numeric summary | 13 scenarios | 14 scenarios |
+**User selection**: Sync all
+**Spot check result**: Corrected Scenario 2 to require at least one host, avoiding overlap between the default-host success case and new empty-farm rejection scenario. Requirements, API contract, and scenario mapping now consistently describe the pre-scrape HTTP 400 behavior.
+
+## 2026-10-21T11:02:28+07:00 — Functional Design Approval
+- **Approval prompt presented**: “Please review the Functional Design deliverables: business logic model, business rules, and domain entities for `exporter-test-api`. Reply ‘approve and continue’ to approve Functional Design and proceed to NFR Requirements, or request changes.”
+- **User input (raw)**: `approve`
+- **Decision**: Approved Functional Design for `exporter-test-api` and continued to NFR Requirements.
+- **Clarification incorporated**: Empty saved-exporter farm with omitted hosts returns HTTP 400 asking for an explicit non-empty list; no scrape occurs.

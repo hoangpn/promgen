@@ -36,6 +36,7 @@ The signatures below describe the proposed design boundary. Names may be adjuste
 - **Purpose**: Resolve the effective scrape settings and target list without persisting test data.
 - **Inputs**: Path ID and validated request data.
 - **Output**: Effective settings and host list; saved settings take precedence for persisted exporters.
+- **Pre-scrape validation**: If saved mode has no explicit hosts and the resolved farm host list is empty, reject with HTTP 400 asking for an explicit, non-empty host list. Do not pass an empty list to the scrape utility.
 
 ### `scrape_exporter_hosts(config: ExporterConfig, hosts: list[str]) -> list[HostTestResult]`
 - **Purpose**: Execute bounded HTTP scrapes using existing timeout/concurrency protections and parse results.

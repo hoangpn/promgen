@@ -22,7 +22,7 @@ There is one Unit of Work, so no inter-unit interface exists. The endpoint below
 
 ### Request schema
 
-The `hosts` list is optional for a saved exporter and required and non-empty for exporter ID `0`. When omitted for a saved exporter, all hosts in its project farm are selected unless that set exceeds the configured limit. Explicit hosts need not belong to that farm. Names and IP addresses, including private and loopback addresses, are allowed.
+The `hosts` list is optional for a saved exporter and required and non-empty for exporter ID `0`. When omitted for a saved exporter, all hosts in its project farm are selected unless that set exceeds the configured limit. If the farm has no hosts, return HTTP 400 asking for an explicit, non-empty host list and do not scrape. Explicit hosts need not belong to that farm. Names and IP addresses, including private and loopback addresses, are allowed.
 
 ```yaml
 type: object
@@ -124,6 +124,7 @@ Metric detail fields may use the existing parser's useful summary, provided the 
 | Invalid temporary settings, missing temporary hosts, or malformed input | `400 Bad Request` with field-level validation details |
 | Explicit host list exceeds configured maximum | `400 Bad Request` describing the configured limit |
 | Saved farm exceeds configured maximum and hosts were omitted | `400 Bad Request` instructing caller to provide an explicit bounded list |
+| Saved farm has no hosts and hosts were omitted | `400 Bad Request` asking caller to provide an explicit, non-empty host list; no scrape occurs |
 | Scrape or metric parsing fails after execution starts | `200 OK`; failure is represented in the host result and aggregate status |
 
 ## Boundary and execution constraints
