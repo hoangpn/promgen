@@ -383,6 +383,12 @@ Are you ready to proceed to generation?
 - **Approval prompt**: “Please review the focused overlap analysis and requirements for `exporter-scrape-reuse`. The requirements preserve both current endpoint contracts while sharing internal scrape execution and metric parsing. Reply `approve and continue` to approve Requirements Analysis and proceed to Workflow Planning, or request changes.”
 - **Status**: Waiting for explicit approval.
 
+## 2026-10-21T11:38:22+07:00 — Application Design Approval
+- **User input (raw)**: `approve`
+- **Decision**: Approved the Application Design deliverables for `exporter-scrape-reuse`; continue to Units Planning.
+- **Deliverables**: Scoped under `inception/application-design/exporter-scrape-reuse/`.
+- **Stage summary**: `inception/stage-summaries/stage-6-application-design-exporter-scrape-reuse-summary.md`.
+
 ## 2026-10-21T11:34:05+07:00 — Follow-up Requirements Analysis Approval
 - **User input (raw)**: `approve`
 - **Decision**: Approved the requirements and focused overlap analysis; continued to Workflow Planning.
@@ -401,3 +407,21 @@ Are you ready to proceed to generation?
 - **Decision**: Approved the workflow plan and continued to Application Design.
 - **Approved stage selection**: Skip User Stories; execute Application Design, Units Planning and Generation, Functional Design, Code Planning, Code Generation, and Build and Test; skip NFR Requirements, NFR Design, and Infrastructure Design.
 - **Checkpoint**: Approved Workflow Planning checkpoint; the existing standard and session tags are preserved, and a unique follow-up session tag will identify this scope.
+
+## 2026-10-21T11:36:18+07:00 — Application Design Plan Review Requested
+- **Unit**: `exporter-scrape-reuse`.
+- **Plan**: `inception/plans/exporter-scrape-reuse-application-design-plan.md`.
+- **Scope**: Define a shared internal per-target scrape and metrics-parsing boundary while keeping caller-specific policies and external behavior in the view/API adapters.
+- **Questions**: None; the approved requirements define behavior-preservation constraints and no unresolved design decision requires user input at this level.
+- **Approval prompt**: “Please review the Application Design Plan for `exporter-scrape-reuse`. Reply `approve and continue` to approve the plan and begin generating the design deliverables, or request changes.”
+- **Status**: Waiting for explicit plan approval.
+
+## 2026-10-21T11:37:46+07:00 — Application Design Plan Approval
+- **User input (raw)**: `approve`
+- **Decision**: Approved the Application Design Plan for `exporter-scrape-reuse`; proceeded to generate the design deliverables.
+
+## 2026-10-21T11:38:22+07:00 — Application Design Review Requested
+- **Deliverables**: `inception/application-design/exporter-scrape-reuse/components.md`, `component-methods.md`, `services.md`, and `component-dependency.md`.
+- **Design boundary**: One shared per-target scrape-and-parse processor; authorization, target selection, URL formatting, pool/deadline behavior, status policy, exception mapping, ordering, and output serialization remain with the existing entry points.
+- **Approval prompt**: “Please review the Application Design deliverables for `exporter-scrape-reuse`. Reply `approve and continue` to approve the shared component boundary and proceed to Units Planning, or request changes.”
+- **Status**: Waiting for explicit approval.
