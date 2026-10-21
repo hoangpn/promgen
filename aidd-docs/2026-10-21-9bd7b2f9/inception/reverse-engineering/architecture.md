@@ -57,7 +57,7 @@ sequenceDiagram
   API-->>Client: HTTP 200 with success and safe message
 ```
 
-The API action sends no notification when authentication, object permission, or notifier lookup fails; those errors retain standard REST behavior. Once delivery is attempted, success and failure both return HTTP 200. Failure responses use the generic `Test notification failed.` message and exclude raw exception text, secrets, and tracebacks. This REST action reuses the existing `Sender.test()` and `send_alert` delivery path; the HTML test endpoint remains a separate POST handler that redirects with a flash message.
+The API action sends no notification when authentication, object permission, or notifier lookup fails; those errors retain standard REST behavior. Once delivery is attempted, success and failure both return HTTP 200. Failure responses include exception text with common credential assignments redacted and exclude tracebacks. This REST action reuses the existing `Sender.test()` and `send_alert` delivery path; the HTML test endpoint remains a separate POST handler that redirects with a flash message.
 
 ## Integration Points
 - **External APIs**: Prometheus and Alertmanager HTTP APIs; provider APIs used by installed notification drivers.

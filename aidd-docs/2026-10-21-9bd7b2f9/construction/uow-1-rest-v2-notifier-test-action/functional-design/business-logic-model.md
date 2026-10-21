@@ -14,8 +14,8 @@ flowchart TD
   F --> G[Send synchronously via configured driver and destination]
   G --> H{Attempt completes successfully?}
   H -- Yes --> I[HTTP 200; success=true; success message]
-  H -- No --> J[Classify failure safely]
-  J --> K[HTTP 200; success=false; safe summary or generic fallback]
+  H -- No --> J[Redact common credential assignments from exception message]
+  J --> K[HTTP 200; success=false; exception detail without traceback]
 ```
 
 ## Functional Inputs
@@ -25,7 +25,7 @@ flowchart TD
 
 ## Functional Outputs
 - **Completed delivery succeeds**: HTTP 200, `success: true`, human-readable success message.
-- **Completed delivery fails**: HTTP 200, `success: false`, safely classified, human-readable failure summary or generic fallback.
+- **Completed delivery fails**: HTTP 200, `success: false`, human-readable exception message with common credential assignments redacted and no traceback.
 - **Request cannot start**: Standard REST authentication, authorization, or not-found response. No delivery occurs.
 
 ## Domain Events / State

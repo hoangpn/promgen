@@ -31,7 +31,7 @@ For a completed delivery attempt, return HTTP 200 whether delivery succeeds or f
 }
 ```
 
-`success` must be `false` when delivery fails. `message` must provide a human-readable result and, on failure, a safe error summary. The body must not expose stack traces or secrets. The API endpoint description must explain that HTTP 200 is used for both successful and failed delivery attempts and that clients should inspect `success`.
+`success` must be `false` when delivery fails. `message` must provide a human-readable result and include the delivery exception message, with common credential assignments (token, password, secret, API key, and authorization) redacted. The body must not expose stack traces. The API endpoint description must explain that HTTP 200 is used for both successful and failed delivery attempts and that clients should inspect `success`.
 
 ### FR-5: Enforce notifier edit permissions
 Only callers with the existing edit-level object permission for the notifier's owning service or project may trigger the test. The endpoint must use Promgen's established authentication and object-level authorization behavior.
@@ -40,7 +40,7 @@ Only callers with the existing edit-level object permission for the notifier's o
 The HTTP 200 rule applies to a completed notification attempt, including delivery failure. It does not convert request-level failures into successful test results: authentication/authorization failures and a missing notifier continue to use the established REST API error behavior and HTTP status codes. No notification should be sent when authorization fails or the notifier cannot be loaded.
 
 ## Non-Functional Requirements
-- **Security**: Reuse existing REST authentication and object-level permissions. Do not return secrets or stack traces in the response.
+- **Security**: Reuse existing REST authentication and object-level permissions. Redact common credential assignments from exception messages and do not return stack traces.
 - **Usability**: Document the always-200 delivery-result behavior in the API schema/endpoint description; clients distinguish outcomes using the `success` field.
 - **Reliability**: A completed response accurately reflects whether the synchronous notifier delivery attempt succeeded or failed.
 - **Operational constraints**: No additional rate limit, audit logging, or other operational constraint was requested.
@@ -52,7 +52,7 @@ The HTTP 200 rule applies to a completed notification attempt, including deliver
 4. The API endpoint description states that both delivery outcomes return HTTP 200 and clients must inspect `success`.
 5. An unauthenticated or unauthorized caller cannot trigger delivery and receives the established REST authentication/permission error response.
 6. A request for a nonexistent notifier does not trigger delivery and receives the established not-found response.
-7. The response does not contain stack traces or secrets.
+7. The response includes the delivery exception message with common credential assignments redacted and no stack trace.
 
 ## Traceability
 | Requirement | Source |

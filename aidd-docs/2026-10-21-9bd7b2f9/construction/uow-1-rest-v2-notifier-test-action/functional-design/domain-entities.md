@@ -15,9 +15,9 @@
 | Field | Type | Meaning |
 |---|---|---|
 | `success` | Boolean | Whether the completed sample delivery succeeded. |
-| `message` | String | Human-readable success message or safely classified failure summary with generic fallback. |
+| `message` | String | Human-readable success message or failure message containing exception details with common credential assignments redacted. |
 
-The result is transient and returned in the HTTP response; it is not persisted. It excludes raw exception text, secrets, and stack traces.
+The result is transient and returned in the HTTP response; it is not persisted. Failure messages include exception text after redacting common credential assignments. Stack traces are excluded.
 
 ## External Concept: Delivery Attempt
 - **Inputs**: Built-in sample alert, notifier driver, and configured destination.

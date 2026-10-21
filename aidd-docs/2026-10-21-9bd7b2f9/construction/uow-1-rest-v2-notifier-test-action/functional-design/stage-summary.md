@@ -4,7 +4,7 @@
 - The operation authenticates, loads the notifier, and checks its edit-level object permission before starting delivery.
 - It sends the built-in sample synchronously through the notifier's configured driver and destination.
 - Completed delivery success and failure both return HTTP 200 with `success` and `message`; request-level failures retain standard REST behavior.
-- Failure messages use a safely classified summary with a generic fallback; raw exception text, secrets, and stack traces are excluded under the approved security requirement.
+- Failure messages include exception details, redact common credential assignments, and exclude stack traces.
 - The operation creates no persistent domain state.
 
 ## Generated Deliverables

@@ -1,6 +1,7 @@
 # Copyright (c) 2026 LINE Corporation
 # These sources are released under the terms of the MIT license: see LICENSE
 import datetime
+import re
 import uuid
 from http import HTTPStatus
 
@@ -551,10 +552,21 @@ class NotifierViewSet(
         notifier = self.get_object()
         try:
             notifier.test()
-        except Exception:
+        except Exception as exc:
+            # Provider errors help diagnose a test send, but may include
+            # credentials. Redact common credential assignments and omit the
+            # traceback from the public response.
+            message = re.sub(
+                r"(?i)(token|password|secret|api[_-]?key|authorization)\s*[:=]\s*\S+",
+                r"\1=[redacted]",
+                str(exc),
+            )
+            message = " ".join(message.split())
+            if "Traceback (most recent call last):" in message:
+                message = ""
             result = {
                 "success": False,
-                "message": "Test notification failed.",
+                "message": "Test notification failed: %s" % (message or type(exc).__name__),
             }
         else:
             result = {

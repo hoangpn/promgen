@@ -36,12 +36,18 @@ class NotifierTestAPITest(tests.PromgenTest):
         self.assertEqual(response.data["message"], "Test notification sent.")
         send_test.assert_called_once_with()
 
-    @mock.patch.object(models.Sender, "test", side_effect=Exception("secret-token=do-not-return"))
+    @mock.patch.object(
+        models.Sender,
+        "test",
+        side_effect=Exception("SMTP rejected recipient; secret-token=do-not-return"),
+    )
     def test_delivery_failure_returns_safe_http_200_result(self, send_test):
         response = self.client.post(self.url)
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data["success"], False)
+        self.assertIn("SMTP rejected recipient", response.data["message"])
+        self.assertIn("secret=[redacted]", response.data["message"])
         self.assertNotIn("secret-token", response.data["message"])
         self.assertNotIn("do-not-return", response.data["message"])
         self.assertNotIn("Traceback", response.data["message"])

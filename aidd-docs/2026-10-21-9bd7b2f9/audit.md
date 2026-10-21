@@ -165,3 +165,10 @@ None.
 - Follow-up implementation scope requires a decision because changing unrelated tests or host-detail query behavior extends beyond the approved UOW-1.
 - User input: “done” — selected option C in `construction/plans/build-and-test-follow-up-questions.md`: accept the three failures as baseline for this run and stop before Operations. No code or test changes are authorized by this selection.
 - Updated state and Build and Test summary to record the decision. Operations was not started.
+
+## Notifier Test Failure Message Change — 2026-10-21
+- User request: “$aidd-construction show exception in message of API NotifierTest”.
+- Updated `NotifierViewSet.test()` to include exception details in the HTTP 200 failure message, redact common credential assignments, collapse multiline content, and omit traceback text.
+- Updated the API failure test and requirements, functional design, code summary, API documentation, and architecture description to match.
+- This changes the previously approved generic/safe-summary response contract. Credential redaction handles common assignment patterns only; review before exposing this endpoint outside trusted callers.
+- Tests and lint were not run.

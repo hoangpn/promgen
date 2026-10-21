@@ -22,7 +22,7 @@
 - **Path**: `/rest/v2/notifiers/{id}/test` (router configured without trailing slashes).
 - **Purpose**: Send the existing sample alert synchronously through the configured notifier.
 - **Request**: Empty request; caller supplies no payload.
-- **Response**: HTTP 200 for completed delivery attempts, with `{ "success": boolean, "message": string }`. Success returns `Test notification sent.`; delivery failure returns the generic safe message `Test notification failed.`. Raw exception text, secrets, and tracebacks are excluded. OpenAPI documents HTTP 200 and the `success` field.
+- **Response**: HTTP 200 for completed delivery attempts, with `{ "success": boolean, "message": string }`. Success returns `Test notification sent.`; delivery failure includes the exception message after redacting common credential assignments. Stack traces are excluded. OpenAPI documents HTTP 200 and the `success` field.
 - **Authorization**: Existing edit-level object permission. Authentication, permission, and not-found errors retain standard REST behavior and do not send a test notification.
 
 ## Internal APIs

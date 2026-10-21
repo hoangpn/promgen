@@ -8,7 +8,7 @@
 ## Contract Behavior
 - Authorized requests use `Sender.test()` with no caller-provided alert data.
 - Completed delivery attempts return HTTP 200 with `success` and `message`.
-- Failures return the fixed safe message “Test notification failed.” Raw exception text, secrets, and stack traces are excluded.
+- Failures return “Test notification failed: <exception message>”; common credential assignments are redacted and stack traces are excluded.
 - Authentication, permission, and not-found errors retain standard REST behavior; no delivery occurs.
 - OpenAPI describes the dual HTTP 200 outcome and response fields.
 

@@ -15,8 +15,8 @@
 8. A completed attempt returns HTTP 200 regardless of its delivery outcome.
 9. Successful delivery returns `success: true` and a human-readable success message.
 10. Failed delivery returns `success: false` and a human-readable failure message.
-11. Failure text may include only a safely classified, user-actionable summary. If it cannot be classified safely, use a generic fallback.
-12. Never return raw exception text, credentials, secrets, or stack traces. Log/diagnostic handling remains governed by existing server-side behavior and is outside the public response contract.
+11. Failure text includes the exception message to help diagnose delivery failures; common credential assignments (token, password, secret, API key, and authorization) are redacted before returning it.
+12. Never return a stack trace. Server-side log/diagnostic handling remains governed by existing behavior and is outside the public response contract.
 13. The API endpoint description states that both completed delivery outcomes return HTTP 200 and clients must inspect `success`.
 
 ## Outcome Boundary
