@@ -45,14 +45,15 @@
 - [x] Workspace Detection (brownfield continuation)
 - [x] Reverse Engineering (focused overlap analysis)
 - [x] Requirements Analysis (approved on 2026-10-21)
-- [ ] User Stories (workflow decision pending)
-- [ ] Workflow Planning
-- [ ] Application Design (workflow decision pending)
-- [ ] Units Generation (workflow decision pending)
+- [ ] User Stories (recommended skip: behavior-preserving refactor)
+- [x] Workflow Planning (approved on 2026-10-21)
+- [ ] Application Design (recommended execute)
+- [ ] Units Planning (recommended execute)
+- [ ] Units Generation (recommended execute)
 
 ## Current Status
 - **Phase**: Inception (follow-up refactor scope)
 - **Current Unit**: `exporter-scrape-reuse` (proposed)
 - **Previous Construction Result**: Build and Test approved; full suite had 2 failures and 1 error. See `construction/build-and-test/build-and-test-summary.md`.
-- **Current Inception Stage**: Workflow Planning.
+- **Current Inception Stage**: Application Design.
 - **Approved Unit of Work**: `exporter-test-api`

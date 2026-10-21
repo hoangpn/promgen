@@ -387,4 +387,17 @@ Are you ready to proceed to generation?
 - **User input (raw)**: `approve`
 - **Decision**: Approved the requirements and focused overlap analysis; continued to Workflow Planning.
 - **Requirements**: Behavior preservation is required for both entry points; shared lower-level scrape processing is the refactor goal.
-- **Checkpoint**: Commit `e1f1351` (`aidd: inception/stage-3-requirements-analysis`). Existing standard tag `aidd/inception/stage-3-requirements-analysis` and session tag `aidd/inception/stage-3-requirements-analysis-2026-10-21-8c46f10e` were preserved; follow-up session tag `aidd/inception/stage-3-requirements-analysis-exporter-scrape-reuse-2026-10-21-8c46f10e` created for this checkpoint.
+- **Checkpoint**: Commit `5eeed27` (`aidd: inception/stage-3-requirements-analysis`). Existing standard tag `aidd/inception/stage-3-requirements-analysis` and session tag `aidd/inception/stage-3-requirements-analysis-2026-10-21-8c46f10e` were preserved; follow-up session tag `aidd/inception/stage-3-requirements-analysis-exporter-scrape-reuse-2026-10-21-8c46f10e` created for this checkpoint.
+
+## 2026-10-21T11:34:05+07:00 — Workflow Planning Review Requested
+- **Scope**: `exporter-scrape-reuse`, one internal refactor unit across the legacy view, v2 API action, and tests.
+- **Plan**: `inception/plans/exporter-scrape-reuse-execution-plan.md`.
+- **Key stage decisions proposed**: Skip User Stories; execute Application Design and Units Planning/Generation to define and map the shared internal component; execute Construction Functional Design, Code Planning, Code Generation, and Build and Test; skip NFR Requirements, NFR Design, and Infrastructure Design.
+- **Approval prompt**: “Please review the workflow plan for `exporter-scrape-reuse`. Reply `approve and continue` to approve these stage choices and proceed to Application Design, or request changes.”
+- **Status**: Waiting for explicit approval.
+
+## 2026-10-21T11:35:28+07:00 — Workflow Planning Approval
+- **User input (raw)**: `approve`
+- **Decision**: Approved the workflow plan and continued to Application Design.
+- **Approved stage selection**: Skip User Stories; execute Application Design, Units Planning and Generation, Functional Design, Code Planning, Code Generation, and Build and Test; skip NFR Requirements, NFR Design, and Infrastructure Design.
+- **Checkpoint**: Approved Workflow Planning checkpoint; the existing standard and session tags are preserved, and a unique follow-up session tag will identify this scope.
