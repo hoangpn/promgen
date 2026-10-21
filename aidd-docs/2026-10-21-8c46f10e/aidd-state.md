@@ -4,7 +4,7 @@
 - **Project Name**: promgen
 - **Project Type**: Brownfield
 - **Start Date**: 2026-10-21T10:21:38+07:00
-- **Current Stage**: CONSTRUCTION - Build and Test (approved; full-suite failures remain)
+- **Current Stage**: INCEPTION - Requirements Analysis (`exporter-scrape-reuse`)
 
 ## Workspace State
 - **Existing Code**: Yes
@@ -41,8 +41,18 @@
 - [x] Code Generation (approved on 2026-10-21)
 - [x] Build and Test (approved on 2026-10-21; failures documented)
 
+## Follow-up Inception — exporter-scrape-reuse
+- [x] Workspace Detection (brownfield continuation)
+- [x] Reverse Engineering (focused overlap analysis)
+- [x] Requirements Analysis (approved on 2026-10-21)
+- [ ] User Stories (workflow decision pending)
+- [ ] Workflow Planning
+- [ ] Application Design (workflow decision pending)
+- [ ] Units Generation (workflow decision pending)
+
 ## Current Status
-- **Phase**: Construction
-- **Current Unit**: `exporter-test-api`
-- **Current Construction Stage**: Build and Test approved; full suite has 2 failures and 1 error. Not ready for Operations; see `construction/build-and-test/build-and-test-summary.md`.
+- **Phase**: Inception (follow-up refactor scope)
+- **Current Unit**: `exporter-scrape-reuse` (proposed)
+- **Previous Construction Result**: Build and Test approved; full suite had 2 failures and 1 error. See `construction/build-and-test/build-and-test-summary.md`.
+- **Current Inception Stage**: Workflow Planning.
 - **Approved Unit of Work**: `exporter-test-api`

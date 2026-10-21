@@ -370,3 +370,21 @@ Are you ready to proceed to generation?
 - **User input (raw)**: `I approve. It's fine.`
 - **Decision**: Approved the Build and Test result with the documented full-suite failures; no request was made to investigate those unrelated test outcomes further.
 - **Checkpoint**: Commit `d1af9bb` (`aidd: construction/stage-6-build-and-test`). The standard tag already existed at `9a9ec54` and was preserved; session tag `aidd/construction/stage-6-build-and-test-2026-10-21-8c46f10e` created for this checkpoint.
+
+## 2026-10-21T11:31:48+07:00 — Follow-up Inception Started
+- **User input (raw)**: `$aidd-inception refactor to reuse duplicate parts between ExporterScrape view and ExporterTest API`
+- **Decision**: Started a behavior-preserving refactor scope within the active brownfield session; prior approved artifacts are retained.
+- **Focused reverse engineering**: Compared `promgen/views.py::ExporterScrape.post` with `promgen/rest_v2.py::ExporterViewSet.test`; common scrape/parse/concurrency mechanics and intentional contract differences are documented in `inception/reverse-engineering/exporter-scrape-reuse-analysis.md`.
+- **Requirements**: Drafted `inception/requirements/exporter-scrape-reuse-requirements.md`; no clarification question was needed because the refactor request implies preserving behavior and the observed differences are recorded as constraints.
+- **Status**: Requirements review pending.
+
+## 2026-10-21T11:31:48+07:00 — Requirements Analysis Review Requested
+- **Deliverables**: `inception/reverse-engineering/exporter-scrape-reuse-analysis.md` and `inception/requirements/exporter-scrape-reuse-requirements.md`.
+- **Approval prompt**: “Please review the focused overlap analysis and requirements for `exporter-scrape-reuse`. The requirements preserve both current endpoint contracts while sharing internal scrape execution and metric parsing. Reply `approve and continue` to approve Requirements Analysis and proceed to Workflow Planning, or request changes.”
+- **Status**: Waiting for explicit approval.
+
+## 2026-10-21T11:34:05+07:00 — Follow-up Requirements Analysis Approval
+- **User input (raw)**: `approve`
+- **Decision**: Approved the requirements and focused overlap analysis; continued to Workflow Planning.
+- **Requirements**: Behavior preservation is required for both entry points; shared lower-level scrape processing is the refactor goal.
+- **Checkpoint**: Commit `e1f1351` (`aidd: inception/stage-3-requirements-analysis`). Existing standard tag `aidd/inception/stage-3-requirements-analysis` and session tag `aidd/inception/stage-3-requirements-analysis-2026-10-21-8c46f10e` were preserved; follow-up session tag `aidd/inception/stage-3-requirements-analysis-exporter-scrape-reuse-2026-10-21-8c46f10e` created for this checkpoint.
