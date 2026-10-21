@@ -231,6 +231,9 @@ AUTHENTICATION_BACKENDS = (
 # Maximum time to wait for all scraping operations to complete (in seconds)
 PROMGEN_EXPORTER_SCRAPE_TIMEOUT = env.int("PROMGEN_EXPORTER_SCRAPE_TIMEOUT", default=25)
 
+# Maximum number of hosts accepted for one exporter test request
+PROMGEN_EXPORTER_TEST_MAX_HOSTS = env.int("PROMGEN_EXPORTER_TEST_MAX_HOSTS", default=50)
+
 # v2 API settings
 V2_API_LOGGING_ENABLED = env.bool("V2_API_LOGGING_ENABLED", default=True)
 

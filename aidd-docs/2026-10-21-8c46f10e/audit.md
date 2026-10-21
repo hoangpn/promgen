@@ -325,4 +325,35 @@ Are you ready to proceed to generation?
 - **User input (raw)**: `approve`
 - **Decision**: Approved NFR Design and continued to Code Planning. Infrastructure Design remains skipped per the approved execution plan.
 - **Stage summary**: `construction/exporter-test-api/stage-summaries/stage-3-nfr-design-summary.md`.
-- **Checkpoint**: Creating the stage-3 commit and tag `aidd/construction/exporter-test-api/stage-3-nfr-design`.
+- **Checkpoint branch**: `aidd/promgen`
+- **Checkpoint commit**: `41c40dc` (`aidd: construction/exporter-test-api/stage-3-nfr-design`)
+- **Checkpoint tag**: `aidd/construction/exporter-test-api/stage-3-nfr-design`
+
+## 2026-10-21T11:11:28+07:00 — Code Planning Review Requested
+- **Unit**: `exporter-test-api`
+- **Plan**: `construction/plans/exporter-test-api-code-generation-plan.md`.
+- **Scope**: Eight ordered steps spanning settings, request/response validation, API action, bounded scraping, OpenAPI schema, endpoint tests, consistency review, and code summary.
+- **Story traceability**: US-1 scenarios 1–14 mapped to implementation steps.
+- **Approval prompt presented**: Review the complete Code Generation Plan; approve the plan and implementation sequence to begin Code Generation, or request changes.
+- **Status**: Waiting for explicit plan approval before modifying application source files.
+
+## 2026-10-21T11:12:58+07:00 — Code Planning Approval
+- **User input (raw)**: `approve`
+- **Decision**: Approved the full Code Generation Plan and implementation sequence.
+- **Plan**: `construction/plans/exporter-test-api-code-generation-plan.md`.
+- **Status**: Code Planning complete; Code Generation started.
+
+## 2026-10-21T11:18:06+07:00 — Code Generation Review Requested
+- **Plan execution**: Completed the eight ordered steps in `construction/plans/exporter-test-api-code-generation-plan.md`.
+- **Story coverage**: US-1 scenarios 1–14 addressed in the endpoint and added API tests.
+- **Static checks**: Python byte compilation passed; `git diff --check` exited 0 with non-fatal Xcode cache warnings.
+- **Test execution**: Not run during Code Generation per the approved plan; Build and Test remains the execution stage.
+- **Summary**: `construction/exporter-test-api/code/code-generation-summary.md`.
+- **Status**: Code Generation deliverables are ready for review; approval pending.
+
+## 2026-10-21 — Code Generation Approval
+- **User input (raw)**: `approve`
+- **Decision**: Approved Code Generation and continued to Build and Test.
+- **Deliverables**: Implementation and endpoint tests recorded in `construction/exporter-test-api/code/code-generation-summary.md`.
+- **Verification at stage boundary**: Python byte compilation passed; `git diff --check` exited 0. Test suite execution deferred to Build and Test per the approved plan.
+- **Checkpoint**: Commit and tag `aidd/construction/exporter-test-api/stage-5-code-generation` to be created.

@@ -1,9 +1,13 @@
 # Copyright (c) 2026 LINE Corporation
 # These sources are released under the terms of the MIT license: see LICENSE
+import concurrent.futures
 import datetime
+import re
+import time
 import uuid
 from http import HTTPStatus
 
+from django.conf import settings as django_settings
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ValidationError as DjangoValidationError
@@ -19,6 +23,7 @@ from drf_spectacular.views import SpectacularAPIView
 from guardian.conf.settings import ANONYMOUS_USER_NAME
 from guardian.models import GroupObjectPermission
 from guardian.shortcuts import assign_perm, get_perms, remove_perm
+from prometheus_client.parser import text_string_to_metric_families
 from rest_framework import (
     exceptions,
     mixins,
@@ -45,6 +50,7 @@ from promgen import (
     serializers,
     settings,
     signals,
+    util,
     validators,
 )
 from promgen.templatetags import promgen as shortcuts
@@ -971,6 +977,193 @@ class ExporterViewSet(
             return self.queryset
         accessible_projects = permissions.get_accessible_projects_for_user(self.request.user)
         return self.queryset.filter(project__in=accessible_projects)
+
+    @extend_schema(
+        summary="Test Exporter",
+        description=(
+            "Test a saved exporter or a temporary exporter (ID 0). Saved exporters require "
+            "project or service viewer, editor, or admin access and always use their stored "
+            "configuration. Temporary requests require hosts, scheme, and port. At most "
+            f"{django_settings.PROMGEN_EXPORTER_TEST_MAX_HOSTS} hosts may be tested. "
+            "HTTP 200 means "
+            "the test ran; per-host outcomes are in the response body. Redirects are not followed."
+        ),
+        request=serializers.ExporterTestRequestSerializer,
+        responses={
+            HTTPStatus.OK: serializers.ExporterTestResultSerializer,
+            HTTPStatus.BAD_REQUEST: None,
+            HTTPStatus.NOT_FOUND: None,
+            HTTPStatus.FORBIDDEN: None,
+            HTTPStatus.UNAUTHORIZED: None,
+        },
+    )
+    @action(detail=True, methods=["post"], url_path="test", filterset_class=None)
+    def test(self, request, id):
+        try:
+            exporter_id = int(id)
+        except (TypeError, ValueError) as error:
+            raise ValidationError({"id": "Exporter ID must be a positive integer or 0."}) from error
+        if exporter_id < 0:
+            raise ValidationError({"id": "Exporter ID must be a positive integer or 0."})
+
+        exporter = None
+        if exporter_id:
+            try:
+                # Do not call get_object(): its generic unsafe-method object check excludes viewers.
+                exporter = self.get_queryset().get(pk=exporter_id)
+            except models.Exporter.DoesNotExist as error:
+                raise NotFound() from error
+
+            roles = [
+                "project_viewer",
+                "project_editor",
+                "project_admin",
+                "service_viewer",
+                "service_editor",
+                "service_admin",
+            ]
+            if not permissions.has_perm(request.user, roles, exporter):
+                raise PermissionDenied()
+
+        request_serializer = serializers.ExporterTestRequestSerializer(
+            data=request.data, context={"exporter_id": exporter_id}
+        )
+        request_serializer.is_valid(raise_exception=True)
+        request_data = request_serializer.validated_data
+
+        if exporter is None:
+            config = {
+                "scheme": request_data["scheme"],
+                "port": request_data["port"],
+                "path": request_data.get("path", "/metrics"),
+            }
+            hosts = request_data["hosts"]
+        else:
+            config = {
+                "scheme": exporter.scheme,
+                "port": exporter.port,
+                "path": exporter.path_value,
+            }
+            if "hosts" in request_data:
+                hosts = request_data["hosts"]
+            else:
+                try:
+                    hosts = list(
+                        exporter.project.farm.host_set.values_list("name", flat=True)[
+                            : django_settings.PROMGEN_EXPORTER_TEST_MAX_HOSTS + 1
+                        ]
+                    )
+                except models.Farm.DoesNotExist:
+                    hosts = []
+                hosts = [serializers.validate_exporter_test_host(host) for host in hosts]
+                if not hosts:
+                    raise ValidationError(
+                        {"hosts": "The farm has no hosts; provide an explicit non-empty host list."}
+                    )
+                if len(hosts) > django_settings.PROMGEN_EXPORTER_TEST_MAX_HOSTS:
+                    raise ValidationError(
+                        {
+                            "hosts": (
+                                "The farm exceeds the configured host limit; provide an explicit "
+                                "list of at most "
+                                f"{django_settings.PROMGEN_EXPORTER_TEST_MAX_HOSTS} hosts."
+                            )
+                        }
+                    )
+
+        timeout = django_settings.PROMGEN_EXPORTER_SCRAPE_TIMEOUT
+        deadline = time.monotonic() + timeout
+        results = [None] * len(hosts)
+
+        def scrape_one(index, host):
+            remaining = deadline - time.monotonic()
+            if remaining <= 0:
+                return index, {
+                    "host": host,
+                    "status": "failure",
+                    "error": "Scrape timed out before the request started.",
+                }
+
+            url_host = f"[{host}]" if ":" in host else host
+            target_url = f"{config['scheme']}://{url_host}:{config['port']}{config['path']}"
+            try:
+                response = util.scrape(
+                    target_url,
+                    timeout=remaining,
+                    allow_redirects=False,
+                )
+                if not 200 <= response.status_code < 300:
+                    return index, {
+                        "host": host,
+                        "status": "failure",
+                        "status_code": response.status_code,
+                        "error": f"HTTP status {response.status_code}",
+                    }
+                metrics = list(text_string_to_metric_families(response.text))
+                return index, {
+                    "host": host,
+                    "status": "success",
+                    "status_code": response.status_code,
+                    "metric_count": len(metrics),
+                    "sample_count": sum(len(metric.samples) for metric in metrics),
+                }
+            except Exception as error:
+                detail = str(error)
+                detail = re.sub(r"(?i)(https?://)[^/@\s]+:[^/@\s]+@", r"\1[redacted]@", detail)
+                detail = re.sub(
+                    r"(?i)((?:password|token|secret|api[_-]?key|access[_-]?key|"
+                    r"authorization|credential)=)([^&\s]+)",
+                    r"\1[redacted]",
+                    detail,
+                )
+                detail = re.sub(
+                    r"(?i)(authorization:\s*bearer\s+)[^\s]+", r"\1[redacted]", detail
+                )
+                return index, {
+                    "host": host,
+                    "status": "failure",
+                    "error": detail or type(error).__name__,
+                }
+
+        with concurrent.futures.ThreadPoolExecutor(max_workers=20) as executor:
+            future_indices = {
+                executor.submit(scrape_one, index, host): index
+                for index, host in enumerate(hosts)
+            }
+            try:
+                for future in concurrent.futures.as_completed(
+                    future_indices, timeout=django_settings.PROMGEN_EXPORTER_SCRAPE_TIMEOUT
+                ):
+                    index, result = future.result()
+                    results[index] = result
+            except concurrent.futures.TimeoutError:
+                for future, index in future_indices.items():
+                    if results[index] is None:
+                        future.cancel()
+                        results[index] = {
+                            "host": hosts[index],
+                            "status": "failure",
+                            "error": "Scrape timed out.",
+                        }
+
+        for index, result in enumerate(results):
+            if result is None:
+                results[index] = {
+                    "host": hosts[index],
+                    "status": "failure",
+                    "error": "Scrape did not complete.",
+                }
+
+        payload = {
+            "status": "success"
+            if all(result["status"] == "success" for result in results)
+            else "failure",
+            "results": results,
+        }
+        return Response(
+            serializers.ExporterTestResultSerializer(payload).data,
+            status=HTTPStatus.OK,
+        )
 
 
 @extend_schema_view(
