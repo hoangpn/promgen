@@ -28,3 +28,7 @@
 - 2026-10-21T08:43:21+07:00 — User Stories deliverable review requested. Complete approval prompt: “Please review `inception/user-stories/stories.md` and `inception/user-stories/personas.md`. Reply `approve` to approve the generated User Stories, or request changes.”
 
 - User approval: “Approve and continue” — approved `inception/user-stories/stories.md` and `inception/user-stories/personas.md`, and authorized continuation to Workflow Planning.
+
+- 2026-10-21T08:44:23+07:00 — Workflow Planning review requested. Complete approval prompt: “Please review `inception/plans/execution-plan.md`. The plan recommends Application Design, Units Planning/Generation, Functional Design, NFR Requirements, Code Planning, Code Generation, and Build and Test; it skips NFR Design and Infrastructure Design because no new NFR controls or infrastructure changes are required. Reply `Approve and continue` to approve the workflow and proceed to Application Design, or request changes.”
+
+- User approval: “approve” — approved `inception/plans/execution-plan.md` and authorized continuation to Application Design.
