@@ -196,4 +196,32 @@ None.
 - User request: “if test existing notifier, don't take the data from request body”.
 - Repository inspection confirmed `NotifierViewSet.test()` reads request data only for ID `0`; saved notifier IDs resolve the persisted object and call its test method without using request-body values.
 - Recommended and user-approved design: preserve behavior, add a regression test proving body values cannot override the saved notifier, and clarify that `sender` and `value` apply only to ID `0` and are ignored for saved notifier IDs.
-- Design record: `construction/plans/uow-1-saved-notifier-ignore-request-body-design.md`. Implementation planning is pending user review of this written spec.
+- Design record: `construction/plans/uow-1-saved-notifier-ignore-request-body-design.md`; user approved the written spec.
+- Created and executed implementation plan `construction/plans/uow-1-saved-notifier-ignore-request-body-implementation-plan.md` inline.
+
+## Docs Sync (Cascade) — Saved Notifier Request Body
+**Timestamp**: 2026-10-21T02:56:12Z
+**Sync mode**: Cascade
+**cascade_id**: aidd-docs-sync-cascade-20261021T025612Z
+**Origin stage**: Construction — user feedback on saved notifier test requests
+**Origin document**: `construction/plans/uow-1-saved-notifier-ignore-request-body-design.md`
+**Feedback content**: For a saved notifier test, do not take notifier configuration from request-body data.
+**Content before correction**: Saved notifier requests had been described as accepting an optional body without stating that its fields are ignored.
+**Content after correction**: Saved notifier requests ignore supplied body fields and use the persisted notifier's configured driver and destination; `sender` and `value` apply only to ID `0`.
+**Cascade-corrected documents**:
+| Document | Corrected Location | Before | After |
+|-------------|---------|--------|--------|
+| `inception/requirements/requirements.md` | FR-2 | Existing notifier must not accept an alert payload. | Clarifies request-body fields cannot override saved driver/destination. |
+| `inception/application-design/components.md` | Notifier REST API interface | Saved notifier tests accept an empty body. | Supplied body fields are ignored; saved configuration is used. |
+| `inception/application-design/unit-interfaces.md` | OpenAPI draft | Body optional for saved notifier. | `sender`/`value` apply only to ID `0`; saved-ID body fields are ignored. |
+| `construction/uow-1-rest-v2-notifier-test-action/functional-design/business-rules.md` | Rule 2 | Saved notifier body is optional. | Body is optional and ignored; persisted configuration is used. |
+| `construction/uow-1-rest-v2-notifier-test-action/functional-design/business-logic-model.md` | Functional Inputs | Empty body for persisted notifier. | Supplied fields are ignored; persisted driver/destination are used. |
+**User selection**: Sync all
+**Spot check result**: OK — FR-2 clarification is minimal and matches the API implementation.
+
+## Saved Notifier Request Body — Implementation Verification
+- Added `NotifierTestAPITest.test_saved_notifier_ignores_request_body_configuration`, which posts an unknown driver and alternate destination to a saved notifier and verifies the persisted notifier is passed to `Sender.test()` with its stored configuration.
+- Clarified the OpenAPI operation description and reverse-engineering API documentation that request-body fields are ignored for saved notifier IDs and used only for ID `0`.
+- Focused characterization test passed (1/1), OpenAPI schema test passed (1/1), and the notifier API class passed (12/12).
+- Updated the requirements and design documents per the approved Sync all selection. No runtime logic change was needed because the saved-ID code path already does not read `request.data`.
+- Existing Django `/etc/prometheus` warnings and SQLite metric table-lock logs occurred during tests; tests passed.

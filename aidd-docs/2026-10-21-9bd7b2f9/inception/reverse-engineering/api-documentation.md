@@ -21,8 +21,8 @@
 - **Method**: POST.
 - **Path**: `/rest/v2/notifiers/{id}/test` (router configured without trailing slashes).
 - **Purpose**: Send the existing sample alert synchronously through a persisted notifier or a temporary destination supplied for ID `0`.
-- **Request**: Empty request for persisted notifier IDs. For ID `0`, provide `{ "sender": "<installed driver>", "value": "<destination>" }` to test a temporary notifier.
-- **Response**: HTTP 200 for completed delivery attempts, with `{ "success": boolean, "message": string }`. Success returns `Test notification sent.`; delivery failure includes the exception message after redacting common credential assignments. Stack traces are excluded. OpenAPI documents both the conditional request and HTTP 200 result.
+- **Request**: For saved notifier IDs, the request body is ignored and the persisted notifier's driver and destination are used. For ID `0`, provide `{ "sender": "<installed driver>", "value": "<destination>" }` to test a temporary notifier; both fields are required.
+- **Response**: HTTP 200 for completed delivery attempts, with `{ "success": boolean, "message": string }`. Success returns `Test notification sent.`; delivery failure includes the exception message after redacting common credential assignments. Stack traces are excluded. OpenAPI documents that request-body fields apply only to ID `0` and are ignored for saved notifier IDs, along with the HTTP 200 result.
 - **Authorization**: Existing edit-level object permission for persisted notifiers. ID `0` requires authentication but has no object permission target. Authentication, permission, not-found, and validation errors retain standard REST behavior and do not send a test notification.
 
 ## Internal APIs

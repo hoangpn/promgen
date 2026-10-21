@@ -16,7 +16,7 @@ Promgen already has `Sender.test()`, which prepares the built-in sample alert an
 Expose a notifier detail action at `POST /rest/v2/notifiers/{id}/test`.
 
 ### FR-2: Use the configured destination and built-in sample
-The endpoint must send the existing built-in sample alert using the selected notifier's configured driver and destination. For an existing notifier, it must not accept a caller-provided alert payload. For ID `0`, it must accept a notification driver and destination to create a temporary notifier in memory and test it without persistence.
+The endpoint must send the existing built-in sample alert using the selected notifier's configured driver and destination. For an existing notifier, it must not accept a caller-provided alert payload, and request-body fields must not override the saved notifier: its configured driver and destination are always used. For ID `0`, it must accept a notification driver and destination to create a temporary notifier in memory and test it without persistence.
 
 ### FR-3: Perform the send attempt synchronously
 The request must wait for the notification attempt to finish before returning its result. The endpoint should reuse the existing notifier test behavior (`Sender.test()` or an equivalent shared operation).

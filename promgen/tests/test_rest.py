@@ -36,6 +36,20 @@ class NotifierTestAPITest(tests.PromgenTest):
         self.assertEqual(response.data["message"], "Test notification sent.")
         send_test.assert_called_once_with()
 
+    @mock.patch.object(models.Sender, "test", autospec=True)
+    def test_saved_notifier_ignores_request_body_configuration(self, send_test):
+        response = self.client.post(
+            self.url,
+            {"sender": "unknown.driver", "value": "caller@example.com"},
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data["success"], True)
+        send_test.assert_called_once_with(self.notifier)
+        self.assertEqual(self.notifier.sender, "promgen.notification.email")
+        self.assertEqual(self.notifier.value, "notifier-test@example.com")
+
     @mock.patch.object(
         models.Sender,
         "test",
@@ -158,6 +172,7 @@ class NotifierTestAPITest(tests.PromgenTest):
         self.assertIn("HTTP 200", operation["description"])
         self.assertIn("ID 0", operation["description"])
         self.assertIn("sender and value", operation["description"])
+        self.assertIn("request-body fields are ignored", operation["description"])
         self.assertIn("success", operation["description"])
         self.assertIn("200", operation["responses"])
 

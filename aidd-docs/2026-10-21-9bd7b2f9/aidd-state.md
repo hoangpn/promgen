@@ -45,6 +45,6 @@
 
 ## Current Status
 - **Lifecycle Phase**: CONSTRUCTION
-- **Current Stage**: Build and Test — original validation is complete with baseline failures; temporary notifier amendment passed 11/11 focused API tests. Operations has not started.
+- **Current Stage**: Build and Test — original validation is complete with baseline failures; notifier API behavior and request-body contract passed 12/12 focused tests. Operations has not started.
 - **Next Stage**: Operations (not started; user selected to stop before this phase)
-- **Status**: Original Build and Test completed with accepted baseline failures. Temporary notifier amendment passed 11/11 focused API tests. Operations has not started.
+- **Status**: Original Build and Test completed with accepted baseline failures. Notifier API behavior and request-body contract passed 12/12 focused API tests. Operations has not started.

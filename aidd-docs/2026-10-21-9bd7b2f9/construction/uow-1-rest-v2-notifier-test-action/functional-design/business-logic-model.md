@@ -20,7 +20,7 @@ flowchart TD
 
 ## Functional Inputs
 - **Path input**: Notifier identifier.
-- **Request body**: Empty for a persisted notifier. For ID `0`, `sender` and `value` configure a temporary in-memory notifier; no caller-provided alert is accepted or used.
+- **Request body**: For a persisted notifier, any supplied fields are ignored and the notifier's stored driver and destination are used. For ID `0`, `sender` and `value` configure a temporary in-memory notifier; no caller-provided alert is accepted or used.
 - **Context inputs**: Authenticated caller; either a persisted notifier and owner or temporary sender/destination configuration; existing sample alert definition; delivery driver/provider result.
 
 ## Functional Outputs

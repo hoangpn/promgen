@@ -16,7 +16,8 @@ There are no inter-unit interfaces: UOW-1 is the only Unit of Work and remains i
     summary: Test Notifier
     description: >-
       Sends the built-in sample alert synchronously through a configured notifier. For ID 0,
-      provide sender and value to test a temporary notifier without saving it; the body is optional otherwise.
+      provide sender and value to test a temporary notifier without saving it; for saved notifier IDs,
+      any supplied request-body fields are ignored and the persisted notifier configuration is used.
       A completed delivery attempt returns HTTP 200 whether delivery succeeds or fails.
       Inspect the success field to determine the delivery outcome. Authentication,
       authorization, and not-found errors use the standard REST error responses.
@@ -28,7 +29,7 @@ There are no inter-unit interfaces: UOW-1 is the only Unit of Work and remains i
           type: integer
     requestBody:
       required: false
-      description: Required for ID 0; omit for a saved notifier.
+      description: Required for ID 0; sender and value are used only for ID 0. Any supplied body for a saved notifier is ignored.
       content:
         application/json:
           schema:

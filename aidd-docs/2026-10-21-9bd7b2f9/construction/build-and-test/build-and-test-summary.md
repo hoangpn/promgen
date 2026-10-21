@@ -12,7 +12,7 @@
 - `ruff check promgen`: passed.
 - `ruff format --check promgen`: passed (81 files already formatted).
 - Focused UOW-1 API tests: passed, 6/6 during Code Generation verification.
-- Temporary notifier amendment API tests: passed, 11/11 with `SECRET_KEY=local-test-key ./.venv/bin/promgen test promgen.tests.test_rest.NotifierTestAPITest --verbosity 1`; this includes persisted notifier behavior, temporary ID `0` validation/delivery/non-persistence/authentication, and OpenAPI schema coverage. The first run exposed an assertion expecting a different credential-key redaction format; the assertion now matches the implementation (`secret-token=[redacted]`) and the rerun passed.
+- Notifier API tests: passed, 12/12 with `SECRET_KEY=local-test-key ./.venv/bin/promgen test promgen.tests.test_rest.NotifierTestAPITest --verbosity 1`; this includes persisted notifier behavior (including ignoring supplied request-body fields), temporary ID `0` validation/delivery/non-persistence/authentication, and OpenAPI schema coverage. The first run exposed an assertion expecting a different credential-key redaction format; the assertion now matches the implementation (`secret-token=[redacted]`) and the rerun passed.
 - The focused run emitted the existing `/etc/prometheus` write warnings and SQLite metric instrumentation table-lock log messages; neither affected the test results.
 
 ## Test Execution Summary
@@ -34,15 +34,15 @@
 - Metric instrumentation continued to log SQLite table-lock warnings during the route test; requests otherwise completed through the host-detail request that triggered the parser error.
 
 ### Integration and Security Coverage
-- **UOW-1 integration scenarios**: 11 focused API tests passed; delivery is mocked, with no live provider contact.
+- **UOW-1 integration scenarios**: 12 focused API tests passed; delivery is mocked, with no live provider contact.
 - **Security cases**: authentication, object permission, not-found handling, and safe failure body are covered by the focused tests.
 - **Performance, contract, and E2E tests**: N/A for this localized change.
 
 ## Overall Status
 - **Django checks and Ruff**: Pass
 - **Full project tests**: Fail (2 failures, 1 error, 2 skipped)
-- **UOW-1 focused API tests**: Pass (11/11 for the completed temporary notifier amendment)
+- **UOW-1 focused API tests**: Pass (12/12, including the saved-notifier request-body regression)
 - **Ready for Operations**: No; the full suite failures need triage before the phase can be considered clear.
 
 ## Next Steps
-User selected option C in `construction/plans/build-and-test-follow-up-questions.md`: accept the three unrelated failures as baseline for this run and stop before Operations. The temporary notifier amendment was separately verified with 11 focused API tests passing. The full suite remains failing on the three previously documented unrelated failures.
+User selected option C in `construction/plans/build-and-test-follow-up-questions.md`: accept the three unrelated failures as baseline for this run and stop before Operations. The notifier API behavior, including the saved-notifier request-body contract, passed 12 focused API tests. The full suite remains failing on the three previously documented unrelated failures.

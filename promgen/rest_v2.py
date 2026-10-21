@@ -541,7 +541,8 @@ class NotifierViewSet(
         description=(
             "Send the built-in sample alert synchronously through the configured notifier. "
             "For notifier ID 0, provide sender and value in the request body to test a temporary "
-            "notifier without saving it; for a saved notifier, the request body is optional. "
+            "notifier without saving it. For saved notifier IDs, request-body fields are ignored "
+            "and the saved notifier configuration is used. "
             "A completed delivery attempt returns HTTP 200 whether delivery succeeds or fails. "
             "Inspect the success field to determine the delivery outcome. Authentication, "
             "authorization, and not-found errors use the standard REST behavior."

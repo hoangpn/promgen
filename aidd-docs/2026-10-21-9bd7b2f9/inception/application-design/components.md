@@ -8,7 +8,7 @@ The change adds a REST v2 action inside the existing Promgen Django application.
 ### Notifier REST API (`promgen.rest_v2.NotifierViewSet`)
 - **Purpose**: Expose operations on notifier records through REST v2.
 - **Responsibilities for US-1**: Resolve persisted notifiers through the existing Guardian REST object-permission policy; for ID 0 validate sender and destination and construct an unsaved notifier; call the existing sample-test operation synchronously; convert delivery completion into a stable HTTP 200 result; and describe the contract in the API schema.
-- **Interface**: `POST /rest/v2/notifiers/{id}/test`; ID 0 requires `sender` and `value`, while saved notifier tests accept an empty body; result contains `success: boolean` and `message: string`.
+- **Interface**: `POST /rest/v2/notifiers/{id}/test`; ID 0 requires `sender` and `value` from the request body, while any body fields supplied for a saved notifier are ignored and its persisted driver and destination are used; result contains `success: boolean` and `message: string`.
 
 ### Notifier Model (`promgen.models.Sender`)
 - **Purpose**: Represent a configured notification destination and driver.

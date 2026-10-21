@@ -2,7 +2,7 @@
 
 ## Request and Authorization
 1. The operation is `POST /rest/v2/notifiers/{id}/test`; it never accepts a caller-provided alert payload.
-2. For a persisted notifier ID, the request body is optional and authentication, notifier lookup, and object permission follow established REST behavior.
+2. For a persisted notifier ID, the request body is optional and ignored; the persisted notifier's configured driver and destination are used. Authentication, notifier lookup, and object permission follow established REST behavior.
 3. The caller must have the existing edit-level object permission for a persisted notifier's owning service or project.
 4. For ID `0`, the caller must provide an installed `sender` driver and non-empty `value`; the endpoint constructs an unsaved notifier and requires authentication but has no object-level permission target.
 5. Authentication, authorization, lookup, or temporary-configuration validation failure ends the request before delivery and preserves the normal REST error status/body.
