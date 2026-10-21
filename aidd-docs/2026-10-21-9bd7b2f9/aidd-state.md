@@ -4,7 +4,7 @@
 - **Project Name**: Promgen
 - **Project Type**: Brownfield
 - **Start Date**: 2026-10-21
-- **Current Stage**: INCEPTION - Stage 5 Workflow Planning approved; checkpoint and transition pending
+- **Current Stage**: INCEPTION - Stage 6 Application Design approved; checkpoint and transition pending
 
 ## Workspace State
 - **Existing Code**: Yes
@@ -28,7 +28,7 @@
 - [x] Requirements Analysis (approved)
 - [x] User Stories (approved)
 - [x] Workflow Planning (approved)
-- [ ] Application Design
+- [x] Application Design (approved)
 - [ ] Units Generation
 
 ## Request Context

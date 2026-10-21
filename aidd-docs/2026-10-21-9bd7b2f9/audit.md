@@ -32,3 +32,11 @@
 - 2026-10-21T08:44:23+07:00 — Workflow Planning review requested. Complete approval prompt: “Please review `inception/plans/execution-plan.md`. The plan recommends Application Design, Units Planning/Generation, Functional Design, NFR Requirements, Code Planning, Code Generation, and Build and Test; it skips NFR Design and Infrastructure Design because no new NFR controls or infrastructure changes are required. Reply `Approve and continue` to approve the workflow and proceed to Application Design, or request changes.”
 
 - User approval: “approve” — approved `inception/plans/execution-plan.md` and authorized continuation to Application Design.
+
+- 2026-10-21T08:45:18+07:00 — Application Design plan review requested. Complete approval prompt: “Please review `inception/plans/application-design-plan.md`. It covers the four required design deliverables and records no unresolved design choices requiring user input. Reply `approve` to authorize generation of the Application Design deliverables, or request changes.”
+
+- User approval: “approve” — approved `inception/plans/application-design-plan.md` and authorized design generation.
+- Application Design deliverables created: component responsibilities, method interfaces, synchronous orchestration, and component dependencies for US-1. Consistency checked against the approved requirements and current code paths.
+- 2026-10-21T08:47:03+07:00 — Application Design deliverable review requested. Complete approval prompt: “Please review the Application Design deliverables in `inception/application-design/`: `components.md`, `component-methods.md`, `services.md`, and `component-dependency.md`. Reply `approve` to approve the design and proceed to Units Generation, or request changes.”
+
+- User approval: “approve” — approved `inception/application-design/` deliverables and authorized continuation to Units Generation.
