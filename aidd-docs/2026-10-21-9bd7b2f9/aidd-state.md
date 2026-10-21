@@ -4,7 +4,7 @@
 - **Project Name**: Promgen
 - **Project Type**: Brownfield
 - **Start Date**: 2026-10-21
-- **Current Stage**: CONSTRUCTION - UOW-1 Functional Design planning
+- **Current Stage**: CONSTRUCTION - UOW-1 NFR Requirements planning
 
 ## Workspace State
 - **Existing Code**: Yes
@@ -37,8 +37,8 @@
 - Jira description and comments: none returned by Jira
 
 ## Construction Progress
-- [ ] UOW-1 Functional Design
-- [ ] UOW-1 NFR Requirements (planned)
+- [x] UOW-1 Functional Design (approved)
+- [ ] UOW-1 NFR Requirements (plan pending user input)
 - [ ] UOW-1 Code Generation
 - [ ] Build and Test
 

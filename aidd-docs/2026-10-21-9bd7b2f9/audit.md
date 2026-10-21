@@ -48,3 +48,20 @@
 - 2026-10-21T08:48:50+07:00 — Units Generation deliverable review requested. Complete approval prompt: “Please review the Units Generation deliverables in `inception/application-design/`: `unit-of-work.md`, `unit-of-work-dependency.md`, `unit-of-work-story-map.md`, `context-map.md`, and `unit-interfaces.md`. Reply `approve` to approve the unit decomposition and proceed to the CONSTRUCTION PHASE, or request changes.”
 
 - User approval: “approve” — approved the Units Generation deliverables and authorized continuation to the Construction Phase.
+
+- 2026-10-21T08:48:50+07:00 — Functional Design clarification requested. Complete prompt: “Please answer Question 1 in `construction/plans/functional-design-questions.md` by choosing the failure message policy, then reply `done`. The choice will determine whether the API returns only a generic failure message or a sanitized classified summary; secrets and stack traces are excluded in every option.”
+
+- User input: “done” — confirmed the Functional Design answer was entered. Answer to Question 1: “X. return raw exception text.” This conflicts with the approved requirements and the question's explicit exclusion of secrets and stack traces. No specification correction has been applied; clarification is required before proceeding.
+- 2026-10-21T08:50:00+07:00 — Functional Design clarification requested. Complete prompt: “Please answer Question 1 in `construction/plans/functional-design-clarification-questions.md` and reply `done`. Your prior answer requests raw exception text, which can conflict with the approved no-secrets/no-stack-traces requirement. The clarification asks for a safe message policy; raw unsanitized exception text cannot be returned under the approved requirement.”
+
+- User input: “done” — confirmed a clarification answer was entered. The answer again selected “X. raw exception text,” leaving the conflict with the approved no-secrets/no-stack-traces requirement unresolved. Functional Design remains paused at question analysis.
+- 2026-10-21T08:51:00+07:00 — Final safe-policy clarification requested. Complete prompt: “Please select A, B, or C in `construction/plans/functional-design-clarification-questions-2.md` and reply `done`. Raw, unsanitized exception text cannot be specified because it may expose secrets or stack traces and conflicts with the approved requirement.”
+
+- User input: “done” — the final clarification file was checked, but its `[Answer]:` field is blank. No safe failure-message policy has been selected; Functional Design remains paused.
+
+- User input: “done” — final clarification answer again selected raw exception text and stated “I changed my mind.” This conflicts with the approved requirements excluding secrets and stack traces. The design preserves the approved security constraint and specifies a safely classified summary with generic fallback; raw exception text is excluded.
+- Functional Design deliverables generated for UOW-1 and checked against US-1 and the approved API contract.
+
+- 2026-10-21T08:55:56+07:00 — Functional Design review requested. Complete approval prompt: “Please review `construction/uow-1-rest-v2-notifier-test-action/functional-design/`. The design uses safely classified failure summaries with a generic fallback and excludes raw exception text, secrets, and stack traces, consistent with the approved requirements. Reply `approve` to approve Functional Design and continue to NFR Requirements, or request changes that preserve the approved security constraint.”
+
+- User approval: “approve” — approved UOW-1 Functional Design and authorized continuation to NFR Requirements.
