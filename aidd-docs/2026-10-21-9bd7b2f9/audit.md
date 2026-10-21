@@ -40,3 +40,11 @@
 - 2026-10-21T08:47:03+07:00 — Application Design deliverable review requested. Complete approval prompt: “Please review the Application Design deliverables in `inception/application-design/`: `components.md`, `component-methods.md`, `services.md`, and `component-dependency.md`. Reply `approve` to approve the design and proceed to Units Generation, or request changes.”
 
 - User approval: “approve” — approved `inception/application-design/` deliverables and authorized continuation to Units Generation.
+
+- 2026-10-21T08:47:21+07:00 — Units Generation plan review requested. Complete approval prompt: “Please review `inception/plans/unit-of-work-plan.md`. It proposes one Unit of Work in the existing Promgen monolith, maps US-1 to that unit, records the public REST contract, and documents that no inter-unit boundary or base-repository plan applies. Reply `approve` to authorize generation or request changes.”
+
+- User approval: “approve” — approved `inception/plans/unit-of-work-plan.md` and authorized unit generation.
+- Units Generation deliverables created: one unit (UOW-1), dependency matrix, US-1 story map, context map, and OpenAPI contract draft. All user stories and acceptance criteria are assigned to UOW-1.
+- 2026-10-21T08:48:50+07:00 — Units Generation deliverable review requested. Complete approval prompt: “Please review the Units Generation deliverables in `inception/application-design/`: `unit-of-work.md`, `unit-of-work-dependency.md`, `unit-of-work-story-map.md`, `context-map.md`, and `unit-interfaces.md`. Reply `approve` to approve the unit decomposition and proceed to the CONSTRUCTION PHASE, or request changes.”
+
+- User approval: “approve” — approved the Units Generation deliverables and authorized continuation to the Construction Phase.

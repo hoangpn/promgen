@@ -4,7 +4,7 @@
 - **Project Name**: Promgen
 - **Project Type**: Brownfield
 - **Start Date**: 2026-10-21
-- **Current Stage**: INCEPTION - Stage 6 Application Design approved; checkpoint and transition pending
+- **Current Stage**: CONSTRUCTION - UOW-1 Functional Design planning
 
 ## Workspace State
 - **Existing Code**: Yes
@@ -29,9 +29,21 @@
 - [x] User Stories (approved)
 - [x] Workflow Planning (approved)
 - [x] Application Design (approved)
-- [ ] Units Generation
+- [x] Units Generation (approved)
 
 ## Request Context
 - Jira issue: PROMGENDEV-276 — “Add API for testing a Notifier”
 - Jira status at intake: Resolved (Done)
 - Jira description and comments: none returned by Jira
+
+## Construction Progress
+- [ ] UOW-1 Functional Design
+- [ ] UOW-1 NFR Requirements (planned)
+- [ ] UOW-1 Code Generation
+- [ ] Build and Test
+
+## Current Status
+- **Lifecycle Phase**: CONSTRUCTION
+- **Current Stage**: UOW-1 Functional Design planning
+- **Next Stage**: Functional Design deliverables
+- **Status**: In progress
