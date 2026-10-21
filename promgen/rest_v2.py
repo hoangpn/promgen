@@ -536,6 +536,34 @@ class NotifierViewSet(
         return serializers.NotifierSerializer
 
     @extend_schema(
+        summary="Test Notifier",
+        description=(
+            "Send the built-in sample alert synchronously through the configured notifier. "
+            "A completed delivery attempt returns HTTP 200 whether delivery succeeds or fails. "
+            "Inspect the success field to determine the delivery outcome. Authentication, "
+            "authorization, and not-found errors use the standard REST behavior."
+        ),
+        request=None,
+        responses={200: serializers.NotifierTestResultSerializer},
+    )
+    @action(detail=True, methods=["post"], url_path="test")
+    def test(self, request, id):
+        notifier = self.get_object()
+        try:
+            notifier.test()
+        except Exception:
+            result = {
+                "success": False,
+                "message": "Test notification failed.",
+            }
+        else:
+            result = {
+                "success": True,
+                "message": "Test notification sent.",
+            }
+        return Response(serializers.NotifierTestResultSerializer(result).data, status=HTTPStatus.OK)
+
+    @extend_schema(
         summary="Add Filter",
         description="Add a filter to the specified notifier.",
         request=serializers.FilterSerializer,

@@ -17,8 +17,13 @@
 - **Response**: Redirect plus success/error flash message.
 - **Authorization**: Service/project admin or editor permissions.
 
-### Potential REST test endpoint (not yet specified)
-- **Method/Path/Request/Response**: Not defined in Jira. Existing API conventions suggest a detail action under `/rest/v2/notifiers/{id}/...`, but the path and contract require confirmation.
+### REST v2 notifier test action
+- **Method**: POST.
+- **Path**: `/rest/v2/notifiers/{id}/test` (router configured without trailing slashes).
+- **Purpose**: Send the existing sample alert synchronously through the configured notifier.
+- **Request**: Empty request; caller supplies no payload.
+- **Response**: HTTP 200 for completed delivery attempts, with `{ "success": boolean, "message": string }`. Success returns `Test notification sent.`; delivery failure returns the generic safe message `Test notification failed.`. Raw exception text, secrets, and tracebacks are excluded. OpenAPI documents HTTP 200 and the `success` field.
+- **Authorization**: Existing edit-level object permission. Authentication, permission, and not-found errors retain standard REST behavior and do not send a test notification.
 
 ## Internal APIs
 ### `models.Sender.test()`
@@ -27,7 +32,7 @@
 - **Return Type**: No explicit return value; dispatch errors may be raised to the caller.
 
 ### `rest_v2.NotifierViewSet`
-- **Methods**: DRF list/update/partial update/destroy; `add_filter`; `delete_filter`.
+- **Methods**: DRF list/update/partial update/destroy; `add_filter`; `delete_filter`; `test` (POST detail action, calls `Sender.test()` and serializes the delivery result).
 - **Authorization**: Guardian REST permission; list queryset is limited to accessible projects/services and the current user's own notifier.
 
 ## Data Models

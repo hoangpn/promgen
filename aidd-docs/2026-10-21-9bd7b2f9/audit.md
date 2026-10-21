@@ -74,3 +74,53 @@
 - 2026-10-21T08:57:31+07:00 — UOW-1 NFR Requirements review requested. Complete approval prompt: “Please review `construction/uow-1-rest-v2-notifier-test-action/nfr-requirements/`. The assessment records no feature-specific SLO, retains existing application/provider defaults, and reuses the existing Python/Django/DRF, permission, notification, and schema stack. Reply `approve` to approve NFR Requirements and continue to Code Generation, or request changes.”
 
 - User approval: “approve” — approved UOW-1 NFR Requirements and authorized continuation to Code Generation planning.
+
+- 2026-10-21T08:57:54+07:00 — UOW-1 Code Generation plan review requested. Complete approval prompt: “Please review `construction/plans/uow-1-rest-v2-notifier-test-action-code-generation-plan.md`. It specifies the exact application and test files, response safety, authorization ordering, schema behavior, and US-1 traceability. Reply `approve` to authorize code generation, or request changes.”
+
+- User approval: “approve” — approved `construction/plans/uow-1-rest-v2-notifier-test-action-code-generation-plan.md` and authorized implementation.
+- TDD red run: all 6 new tests failed because the `sender-test` route was not yet registered. TDD green run: all 6 tests passed after implementation.
+- Ruff lint and formatting checks passed for the modified Python files.
+
+
+## Docs Sync (Forward) — Dry Run
+**Timestamp**: 2026-10-21T09:02:31+07:00
+**Sync mode**: Forward Sync
+**Trigger**: Automatic after Code Generation
+**Detected change categories**: API change; business logic change
+**Information sources**: Code Generation plan `construction/plans/uow-1-rest-v2-notifier-test-action-code-generation-plan.md`; `git diff HEAD` lists 6 tracked changed files; all code changes match the approved plan.
+
+### Needs update (4 items)
+| Document | Reason | Proposed correction |
+|---|---|---|
+| `inception/reverse-engineering/api-documentation.md` | REST v2 notifier section says the API test endpoint is undefined. | Document the POST detail action, empty request, result body, permissions, and HTTP 200 delivery outcomes. |
+| `inception/reverse-engineering/architecture.md` | Data flow calls the request and response behavior proposed/unknown. | Replace with the implemented synchronous `Sender.test()` path and completed-result/request-error boundary. |
+| `inception/reverse-engineering/code-structure.md` | `NotifierViewSet` inventory says there is no test action. | Add the test action, response serializer, and focused API coverage to the inventory. |
+| `inception/reverse-engineering/business-overview.md` | Business transactions do not mention API-driven notifier verification. | Add testing a configured notifier via the built-in sample alert as an API transaction. |
+
+### No update needed (5 items)
+| Document | Reason |
+|---|---|
+| `inception/requirements/requirements.md` | Already matches endpoint, response, permissions, and safe failure contract. |
+| `inception/reverse-engineering/component-inventory.md` | No component or package boundary was added. |
+| `inception/reverse-engineering/technology-stack.md` | No technology or configuration changed. |
+| `inception/reverse-engineering/dependencies.md` | No dependency or inter-component dependency changed. |
+| Construction Functional Design and NFR documents | Current behavior conforms to the safe-message and result contract; generic failure message is an allowed fallback. |
+
+### Needs review (0 items)
+None.
+
+**Out-of-plan changes**: None.
+**User selection**: Pending.
+
+**User selection**: Sync all
+**Updated documents**:
+- `inception/reverse-engineering/api-documentation.md`: documented implemented REST v2 notifier test API and result contract.
+- `inception/reverse-engineering/architecture.md`: documented synchronous delivery flow and request-error boundary.
+- `inception/reverse-engineering/code-structure.md`: updated API, serializer, router, and test inventory.
+- `inception/reverse-engineering/business-overview.md`: added notifier testing via REST to business transactions.
+**Spot check result**: OK — architecture data flow matches `NotifierViewSet.test()` → `Sender.test()` → `send_alert()` and the API result behavior.
+**Timestamp**: 2026-10-21T09:04:01+07:00
+
+- 2026-10-21T09:04:01+07:00 — Code Generation review requested. Complete approval prompt: “Please review the implementation in `promgen/rest_v2.py`, `promgen/serializers.py`, and `promgen/tests/test_rest.py`, plus `construction/uow-1-rest-v2-notifier-test-action/code/code-generation-summary.md`. The targeted API tests passed (6/6), Ruff lint and format checks passed, and the forward docs sync updated the four approved Inception documents. Reply `approve` to approve Code Generation and proceed to Build and Test, or request changes.”
+
+- User approval: “approve” — approved UOW-1 Code Generation and authorized continuation to Build and Test.

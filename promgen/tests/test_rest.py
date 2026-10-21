@@ -16,6 +16,76 @@ from promgen import models, plugins, rest, signals, tests
 from promgen.notification.email import NotificationEmail
 
 
+class NotifierTestAPITest(tests.PromgenTest):
+    @override_settings(PROMGEN=tests.SETTINGS)
+    def setUp(self):
+        self.user = self.force_login("admin")
+        self.service = models.Service.objects.get(pk=1)
+        self.notifier = NotificationEmail.create(
+            obj=self.service, value="notifier-test@example.com", owner=self.user
+        )
+        assign_perm("service_editor", self.user, self.service)
+        self.url = reverse("api-v2:sender-test", kwargs={"id": self.notifier.pk})
+
+    @mock.patch.object(models.Sender, "test")
+    def test_authorized_editor_gets_success_result_after_synchronous_send(self, send_test):
+        response = self.client.post(self.url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data["success"], True)
+        self.assertEqual(response.data["message"], "Test notification sent.")
+        send_test.assert_called_once_with()
+
+    @mock.patch.object(models.Sender, "test", side_effect=Exception("secret-token=do-not-return"))
+    def test_delivery_failure_returns_safe_http_200_result(self, send_test):
+        response = self.client.post(self.url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data["success"], False)
+        self.assertNotIn("secret-token", response.data["message"])
+        self.assertNotIn("do-not-return", response.data["message"])
+        self.assertNotIn("Traceback", response.data["message"])
+        send_test.assert_called_once_with()
+
+    @mock.patch.object(models.Sender, "test")
+    def test_unauthenticated_request_does_not_send(self, send_test):
+        self.client.logout()
+
+        response = self.client.post(self.url)
+
+        self.assertEqual(response.status_code, 401)
+        send_test.assert_not_called()
+
+    @mock.patch.object(models.Sender, "test")
+    def test_viewer_cannot_send_notifier_test(self, send_test):
+        viewer = User.objects.get(username="demo")
+        assign_perm("service_viewer", viewer, self.service)
+        self.client.force_login(viewer, "django.contrib.auth.backends.ModelBackend")
+
+        response = self.client.post(self.url)
+
+        self.assertEqual(response.status_code, 403)
+        send_test.assert_not_called()
+
+    @mock.patch.object(models.Sender, "test")
+    def test_missing_notifier_does_not_send(self, send_test):
+        url = reverse("api-v2:sender-test", kwargs={"id": 999999})
+
+        response = self.client.post(url)
+
+        self.assertEqual(response.status_code, 404)
+        send_test.assert_not_called()
+
+    def test_openapi_describes_both_delivery_outcomes_as_http_200(self):
+        response = self.client.get(reverse("api-v2:schema"), {"format": "json"})
+
+        self.assertEqual(response.status_code, 200)
+        operation = response.json()["paths"]["/rest/v2/notifiers/{id}/test"]["post"]
+        self.assertIn("HTTP 200", operation["description"])
+        self.assertIn("success", operation["description"])
+        self.assertIn("200", operation["responses"])
+
+
 class RestAPITest(tests.PromgenTest):
     def _run_rest_test(self, case):
         def _parse_case_json(value, default):

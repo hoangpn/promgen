@@ -40,21 +40,24 @@ sequenceDiagram
   participant Client
   participant API as Django REST API
   participant DB as Database
-  participant Task as Celery task
+  participant Sender as Sender.test()
+  participant Task as send_alert()
   participant Driver as Notification driver
   participant Provider as External provider
-  Client->>API: POST notifier test request (proposed scope)
-  API->>DB: Load notifier and enforce permissions
-  API->>Task: Dispatch sample alert
-  Task->>Driver: Resolve configured sender driver
+  Client->>API: POST /rest/v2/notifiers/{id}/test (empty request)
+  API->>DB: Load notifier and enforce edit-level object permission
+  API->>Sender: Call test()
+  Sender->>Task: Call existing send_alert synchronously
+  Task->>Driver: Resolve and invoke configured driver
   Driver->>Provider: Deliver test notification
   Provider-->>Driver: Delivery result
-  Driver-->>Task: Result or error
-  Task-->>API: Completion behavior depends on API contract
-  API-->>Client: Response behavior depends on API contract
+  Driver-->>Task: Result or exception
+  Task-->>Sender: Return outcome
+  Sender-->>API: Completed delivery outcome
+  API-->>Client: HTTP 200 with success and safe message
 ```
 
-The sequence above describes the likely feature area, not a confirmed contract. The existing HTML test endpoint uses a POST and returns a redirect with a flash message; the ticket does not specify the new API response or synchronous/asynchronous behavior.
+The API action sends no notification when authentication, object permission, or notifier lookup fails; those errors retain standard REST behavior. Once delivery is attempted, success and failure both return HTTP 200. Failure responses use the generic `Test notification failed.` message and exclude raw exception text, secrets, and tracebacks. This REST action reuses the existing `Sender.test()` and `send_alert` delivery path; the HTML test endpoint remains a separate POST handler that redirects with a flash message.
 
 ## Integration Points
 - **External APIs**: Prometheus and Alertmanager HTTP APIs; provider APIs used by installed notification drivers.

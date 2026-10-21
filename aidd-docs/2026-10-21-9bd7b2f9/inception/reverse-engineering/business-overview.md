@@ -14,7 +14,7 @@ Text alternative: Operators configure monitoring targets, rules, and notificatio
 
 ## Business Description
 - **Business Description**: Promgen generates and manages Prometheus configuration and alerting routes through a Django web application.
-- **Business Transactions**: Register services and projects; manage exporters and monitoring targets; configure alert rules; receive and process alerts; manage notifier destinations and filters; generate Prometheus and Alertmanager configuration; query monitoring systems through proxy endpoints.
+- **Business Transactions**: Register services and projects; manage exporters and monitoring targets; configure alert rules; receive and process alerts; manage notifier destinations and filters; test a configured notifier by synchronously sending a sample alert through the REST API; generate Prometheus and Alertmanager configuration; query monitoring systems through proxy endpoints.
 - **Business Dictionary**:
   - **Service**: A monitored service grouping projects and related configuration.
   - **Project**: A Promgen-owned monitoring domain associated with a service.

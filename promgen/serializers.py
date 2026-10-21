@@ -238,6 +238,11 @@ class UpdateNotifierSerializer(serializers.ModelSerializer):
         fields = ["enabled"]
 
 
+class NotifierTestResultSerializer(serializers.Serializer):
+    success = serializers.BooleanField()
+    message = serializers.CharField()
+
+
 class RuleRetrieveSimpleSerializer(serializers.ModelSerializer):
     content_name = serializers.CharField(read_only=True, source="content_object.name")
     content_type = serializers.CharField(read_only=True, source="content_type.model")
