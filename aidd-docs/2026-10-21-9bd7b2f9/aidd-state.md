@@ -41,10 +41,10 @@
 - [x] UOW-1 NFR Requirements (approved)
 - [x] UOW-1 Code Planning (approved)
 - [x] UOW-1 Code Generation (approved)
-- [ ] Build and Test
+- [x] Build and Test (executed; full suite has unresolved failures)
 
 ## Current Status
 - **Lifecycle Phase**: CONSTRUCTION
-- **Current Stage**: UOW-1 Functional Design planning
-- **Next Stage**: Functional Design deliverables
-- **Status**: In progress
+- **Current Stage**: Build and Test — validation complete with failures
+- **Next Stage**: Operations (not started; user selected to stop before this phase)
+- **Status**: Build and Test complete with accepted baseline failures; Operations has not started

@@ -124,3 +124,44 @@ None.
 - 2026-10-21T09:04:01+07:00 — Code Generation review requested. Complete approval prompt: “Please review the implementation in `promgen/rest_v2.py`, `promgen/serializers.py`, and `promgen/tests/test_rest.py`, plus `construction/uow-1-rest-v2-notifier-test-action/code/code-generation-summary.md`. The targeted API tests passed (6/6), Ruff lint and format checks passed, and the forward docs sync updated the four approved Inception documents. Reply `approve` to approve Code Generation and proceed to Build and Test, or request changes.”
 
 - User approval: “approve” — approved UOW-1 Code Generation and authorized continuation to Build and Test.
+
+## Build and Test Stage
+**Timestamp**: 2026-10-21T09:09:22+07:00
+**Build status**: Django checks, migration check, and Ruff checks passed; full suite failed
+**Test status**: Fail — 91 tests: 85 passed, 2 failed, 1 error, 2 skipped
+**Focused UOW-1 tests**: Pass — 6/6 (run during Code Generation verification)
+**Failures**:
+- `promgen.tests.test_alert_rules.RuleTest.test_write_new` — expected rule output differs from actual output.
+- `promgen.tests.test_renderers.RendererTests.test_global_rule` — expected rendered rule list differs from actual output.
+- `promgen.tests.test_web.WebTests.test_routes` (`host-detail`) — SQLite `OperationalError: parser stack overflow`.
+**Environment notes**: Django checks report three `promgen.W002` warnings for unwritable `/etc/prometheus`; test instrumentation reports SQLite metric-table lock warnings. Full suite repeated twice with the same failure set.
+**Failure isolation**: All three failing tests were rerun individually and reproduced independently.
+**Generated files**:
+- `construction/build-and-test/build-instructions.md`
+- `construction/build-and-test/unit-test-instructions.md`
+- `construction/build-and-test/integration-test-instructions.md`
+- `construction/build-and-test/security-test-instructions.md`
+- `construction/build-and-test/build-and-test-summary.md`
+
+## Docs Sync (Forward) — Post Build and Test Review
+**Timestamp**: 2026-10-21T09:09:22+07:00
+**Sync mode**: Forward Sync
+**Trigger**: Recommended review after Build and Test
+**Detected change categories**: No application-code changes since the approved Code Generation checkpoint; only Build and Test documentation/state was added or updated.
+**Analysis results**:
+- Needs update: 0 items
+- No update needed: 4 previously synchronized Inception documents; endpoint behavior and response contract remain consistent.
+- Needs review: 0 items
+**User selection**: Sync all (no documents required correction)
+**Updated documents**: None
+**Spot check result**: OK — API documentation and architecture descriptions match the implemented endpoint and safe result behavior.
+
+## Build and Test Failure Triage — 2026-10-21
+- Re-ran `RuleTest.test_write_new`, `RendererTests.test_global_rule`, and `WebTests.test_routes` together; all prior failures reproduced.
+- Re-ran `WebTests.test_routes` alone; its `host-detail` subtest again failed with SQLite `OperationalError: parser stack overflow` while evaluating the nested rule queryset in `HostDetail.get()` (`promgen/views.py:278`).
+- Both rule rendering failures have the same actual/expected discrepancy: current model ordering emits `Site Rule` before `example-rule`, while expected YAML lists `example-rule` first. `Rule.Meta.ordering` is `content_type`, `object_id`, `name`.
+- The three failures do not exercise the notifier API path. They indicate unrelated suite issues: two rule-order expectations and an SQLite query parser limit. No application code or tests were changed during triage.
+- Updated `construction/build-and-test/build-and-test-summary.md` with the reproduction and findings. Full suite remains failing; Operations readiness is unchanged.
+- Follow-up implementation scope requires a decision because changing unrelated tests or host-detail query behavior extends beyond the approved UOW-1.
+- User input: “done” — selected option C in `construction/plans/build-and-test-follow-up-questions.md`: accept the three failures as baseline for this run and stop before Operations. No code or test changes are authorized by this selection.
+- Updated state and Build and Test summary to record the decision. Operations was not started.
