@@ -20,13 +20,13 @@ flowchart TD
 
 ## Functional Inputs
 - **Path input**: Notifier identifier.
-- **Request body**: Empty; no caller-provided alert is accepted or used.
-- **Context inputs**: Authenticated caller, notifier configuration and owner, existing sample alert definition, delivery driver/provider result.
+- **Request body**: Empty for a persisted notifier. For ID `0`, `sender` and `value` configure a temporary in-memory notifier; no caller-provided alert is accepted or used.
+- **Context inputs**: Authenticated caller; either a persisted notifier and owner or temporary sender/destination configuration; existing sample alert definition; delivery driver/provider result.
 
 ## Functional Outputs
 - **Completed delivery succeeds**: HTTP 200, `success: true`, human-readable success message.
 - **Completed delivery fails**: HTTP 200, `success: false`, human-readable exception message with common credential assignments redacted and no traceback.
-- **Request cannot start**: Standard REST authentication, authorization, or not-found response. No delivery occurs.
+- **Request cannot start**: Standard REST authentication, authorization, not-found, or temporary-configuration validation response. No delivery occurs.
 
 ## Domain Events / State
 The operation does not create persistent domain state. It performs a synchronous external side effect and returns its outcome to the caller. It does not enqueue a follow-up operation or expose a task identifier.

@@ -17,7 +17,7 @@
 | `success` | Boolean | Whether the completed sample delivery succeeded. |
 | `message` | String | Human-readable success message or failure message containing exception details with common credential assignments redacted. |
 
-The result is transient and returned in the HTTP response; it is not persisted. Failure messages include exception text after redacting common credential assignments. Stack traces are excluded.
+The result is transient and returned in the HTTP response; it is not persisted. A temporary notifier used for ID `0` is also transient and contains only the selected driver and destination. Failure messages include exception text after redacting common credential assignments. Stack traces are excluded.
 
 ## External Concept: Delivery Attempt
 - **Inputs**: Built-in sample alert, notifier driver, and configured destination.

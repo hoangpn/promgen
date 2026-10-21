@@ -172,3 +172,14 @@ None.
 - Updated the API failure test and requirements, functional design, code summary, API documentation, and architecture description to match.
 - This changes the previously approved generic/safe-summary response contract. Credential redaction handles common assignment patterns only; review before exposing this endpoint outside trusted callers.
 - Tests and lint were not run.
+
+## Temporary Notifier Test Design Amendment — 2026-10-21
+- User request: “$aidd-construction Allow test temporary notifier if user pass 0 to NotifierTest and necessary data.”
+- Repository analysis found `NotifierTestRequestSerializer` already defines `sender` and `value` for ID 0, and a second `test_notifier` action duplicates the established `/test` route. The named `sender-test` route currently reaches `test`, which cannot process ID 0.
+- Drafted `construction/plans/uow-1-temporary-notifier-test-amendment.md`. It proposes using the existing serializer, constructing an unsaved `Sender`, preserving the current response/security behavior, and consolidating the duplicate route.
+- Review prompt issued at 2026-10-21T02:38:57Z: “Please review `construction/plans/uow-1-temporary-notifier-test-amendment.md`. Reply `approve` to authorize implementation, or request changes.”
+- User approval: “approve” — approved the design amendment and authorized implementation.
+- Implemented temporary ID `0` handling using an unsaved `Sender`, consolidated the duplicate test action, added focused API coverage, and synchronized the API and design documents.
+- Test execution is pending; the current environment lacks `drf_spectacular` in the active Python interpreter. No tests or lint were run.
+- Code Generation review requested after implementation, with code paths in `promgen/rest_v2.py`, `promgen/serializers.py`, and `promgen/tests/test_rest.py`, plus updated documentation.
+- User approval: “approve” — approved the implementation. Create the amendment checkpoint with tag `aidd/construction/uow-1-rest-v2-notifier-test-action/stage-5-code-generation-temporary-notifier-2026-10-21`; Build and Test verification remains pending.

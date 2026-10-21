@@ -4,7 +4,7 @@
 - **Project Name**: Promgen
 - **Project Type**: Brownfield
 - **Start Date**: 2026-10-21
-- **Current Stage**: CONSTRUCTION - Build and Test
+- **Current Stage**: CONSTRUCTION - Build and Test (temporary notifier amendment verification pending)
 
 ## Workspace State
 - **Existing Code**: Yes
@@ -45,6 +45,6 @@
 
 ## Current Status
 - **Lifecycle Phase**: CONSTRUCTION
-- **Current Stage**: Build and Test — validation complete with failures
+- **Current Stage**: Build and Test — original validation is complete with baseline failures; temporary notifier amendment implementation is complete and needs focused verification
 - **Next Stage**: Operations (not started; user selected to stop before this phase)
-- **Status**: Build and Test complete with accepted baseline failures; Operations has not started
+- **Status**: Original Build and Test completed with accepted baseline failures. Temporary notifier amendment code and test coverage were added after approval; verification has not been run. Operations has not started.

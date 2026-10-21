@@ -5,7 +5,7 @@ No separate application service is introduced. The REST viewset coordinates the 
 
 1. DRF authenticates the request and resolves the notifier detail object.
 2. The existing object permission policy checks the caller's edit-level permission for the owning project or service. Failure ends the request before delivery.
-3. The action invokes `Sender.test()` synchronously with no caller-provided alert data.
+3. For a persisted notifier, the action invokes `Sender.test()` synchronously with no request body. For notifier ID 0, it validates `sender` and `value`, builds an unsaved Sender, and invokes the same sample operation.
 4. `Sender.test()` builds the built-in sample and calls `promgen.tasks.send_alert` with the notifier's configured driver and target.
 5. A normal return produces HTTP 200 with `success: true` and a human-readable message.
 6. A delivery exception is caught at the API boundary and produces HTTP 200 with `success: false` and a safe human-readable summary. The summary must not include exception text unless it has been safely reduced; it must not include credentials, secrets, or a traceback.

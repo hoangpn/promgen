@@ -44,8 +44,8 @@ sequenceDiagram
   participant Task as send_alert()
   participant Driver as Notification driver
   participant Provider as External provider
-  Client->>API: POST /rest/v2/notifiers/{id}/test (empty request)
-  API->>DB: Load notifier and enforce edit-level object permission
+  Client->>API: POST /rest/v2/notifiers/{id}/test (body only for ID 0)
+  API->>DB: Load persisted notifier and enforce edit-level permission
   API->>Sender: Call test()
   Sender->>Task: Call existing send_alert synchronously
   Task->>Driver: Resolve and invoke configured driver
@@ -57,7 +57,7 @@ sequenceDiagram
   API-->>Client: HTTP 200 with success and safe message
 ```
 
-The API action sends no notification when authentication, object permission, or notifier lookup fails; those errors retain standard REST behavior. Once delivery is attempted, success and failure both return HTTP 200. Failure responses include exception text with common credential assignments redacted and exclude tracebacks. This REST action reuses the existing `Sender.test()` and `send_alert` delivery path; the HTML test endpoint remains a separate POST handler that redirects with a flash message.
+For ID 0, the API validates sender and destination, then creates an unsaved `Sender`; no notifier lookup or object permission applies. Persisted notifier IDs continue to require an edit-level object permission. Authentication and validation failures, permission failures, and missing persisted notifiers send nothing and retain standard REST behavior. Once delivery is attempted, success and failure both return HTTP 200. Failure responses include exception text with common credential assignments redacted and exclude tracebacks. Both paths reuse `Sender.test()` and `send_alert`; the HTML test endpoint remains a separate POST handler that redirects with a flash message.
 
 ## Integration Points
 - **External APIs**: Prometheus and Alertmanager HTTP APIs; provider APIs used by installed notification drivers.

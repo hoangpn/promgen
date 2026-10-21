@@ -53,6 +53,75 @@ class NotifierTestAPITest(tests.PromgenTest):
         self.assertNotIn("Traceback", response.data["message"])
         send_test.assert_called_once_with()
 
+    @mock.patch.object(models.Sender, "test", autospec=True)
+    def test_temporary_notifier_sends_without_persisting(self, send_test):
+        url = reverse("api-v2:sender-test", kwargs={"id": 0})
+        initial_count = models.Sender.objects.count()
+        payload = {"sender": "promgen.notification.email", "value": "temporary@example.com"}
+
+        response = self.client.post(url, payload, format="json")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data["success"], True)
+        send_test.assert_called_once()
+        temporary_notifier = send_test.call_args.args[0]
+        self.assertEqual(temporary_notifier.sender, payload["sender"])
+        self.assertEqual(temporary_notifier.value, payload["value"])
+        self.assertIsNone(temporary_notifier.pk)
+        self.assertEqual(models.Sender.objects.count(), initial_count)
+
+    @mock.patch.object(models.Sender, "test", side_effect=Exception("SMTP unavailable"))
+    def test_temporary_notifier_returns_delivery_failure(self, send_test):
+        url = reverse("api-v2:sender-test", kwargs={"id": 0})
+
+        response = self.client.post(
+            url,
+            {"sender": "promgen.notification.email", "value": "temporary@example.com"},
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data["success"], False)
+        self.assertIn("SMTP unavailable", response.data["message"])
+        send_test.assert_called_once()
+
+    @mock.patch.object(models.Sender, "test")
+    def test_temporary_notifier_requires_sender_and_value(self, send_test):
+        url = reverse("api-v2:sender-test", kwargs={"id": 0})
+
+        response = self.client.post(url, {}, format="json")
+
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("sender", response.data)
+        self.assertIn("value", response.data)
+        send_test.assert_not_called()
+
+    @mock.patch.object(models.Sender, "test")
+    def test_temporary_notifier_rejects_unknown_sender(self, send_test):
+        url = reverse("api-v2:sender-test", kwargs={"id": 0})
+
+        response = self.client.post(
+            url, {"sender": "unknown.driver", "value": "destination"}, format="json"
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("sender", response.data)
+        send_test.assert_not_called()
+
+    @mock.patch.object(models.Sender, "test")
+    def test_unauthenticated_temporary_notifier_does_not_send(self, send_test):
+        self.client.logout()
+        url = reverse("api-v2:sender-test", kwargs={"id": 0})
+
+        response = self.client.post(
+            url,
+            {"sender": "promgen.notification.email", "value": "temporary@example.com"},
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, 401)
+        send_test.assert_not_called()
+
     @mock.patch.object(models.Sender, "test")
     def test_unauthenticated_request_does_not_send(self, send_test):
         self.client.logout()
@@ -88,6 +157,8 @@ class NotifierTestAPITest(tests.PromgenTest):
         self.assertEqual(response.status_code, 200)
         operation = response.json()["paths"]["/rest/v2/notifiers/{id}/test"]["post"]
         self.assertIn("HTTP 200", operation["description"])
+        self.assertIn("ID 0", operation["description"])
+        self.assertIn("sender and value", operation["description"])
         self.assertIn("success", operation["description"])
         self.assertIn("200", operation["responses"])
 

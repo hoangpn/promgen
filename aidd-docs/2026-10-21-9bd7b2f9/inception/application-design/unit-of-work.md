@@ -3,10 +3,11 @@
 ## UOW-1: REST v2 Notifier Test Action
 
 - **Owning application**: Existing Promgen Django monolith.
-- **Mapped story**: US-1 — Test a configured notifier.
+- **Mapped story**: US-1 — Test a notifier.
 - **Goal**: Add a permission-protected synchronous REST v2 action that sends the built-in sample through the notifier's configured driver and target, then reports the delivery outcome safely.
 - **Scope**:
   - Add `POST /rest/v2/notifiers/{id}/test` to `NotifierViewSet`.
+  - Allow ID `0` to test a temporary notifier from `sender` and `value` request fields without saving it.
   - Reuse `Sender.test()` and the existing synchronous `send_alert` path.
   - Apply existing edit-level object permission behavior before sending.
   - Return HTTP 200 with boolean `success` and human-readable `message` for completed delivery attempts, with safe failure details.

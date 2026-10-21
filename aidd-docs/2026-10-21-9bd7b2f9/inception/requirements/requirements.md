@@ -16,7 +16,7 @@ Promgen already has `Sender.test()`, which prepares the built-in sample alert an
 Expose a notifier detail action at `POST /rest/v2/notifiers/{id}/test`.
 
 ### FR-2: Use the configured destination and built-in sample
-The endpoint must send the existing built-in sample alert using the selected notifier's configured driver and destination. It must not accept a caller-provided alert payload.
+The endpoint must send the existing built-in sample alert using the selected notifier's configured driver and destination. For an existing notifier, it must not accept a caller-provided alert payload. For ID `0`, it must accept a notification driver and destination to create a temporary notifier in memory and test it without persistence.
 
 ### FR-3: Perform the send attempt synchronously
 The request must wait for the notification attempt to finish before returning its result. The endpoint should reuse the existing notifier test behavior (`Sender.test()` or an equivalent shared operation).
@@ -39,6 +39,9 @@ Only callers with the existing edit-level object permission for the notifier's o
 ### FR-6: Handle request-level failures separately
 The HTTP 200 rule applies to a completed notification attempt, including delivery failure. It does not convert request-level failures into successful test results: authentication/authorization failures and a missing notifier continue to use the established REST API error behavior and HTTP status codes. No notification should be sent when authorization fails or the notifier cannot be loaded.
 
+### FR-7: Test a temporary notifier
+When the path ID is `0`, accept `sender` and `value` in the JSON request body. Both fields are required, and `sender` must name an installed notification driver. Require authentication, but no object-level permission applies because no persisted owner object is involved. Do not create or update a database record. Invalid or missing fields return the standard DRF validation response without attempting delivery.
+
 ## Non-Functional Requirements
 - **Security**: Reuse existing REST authentication and object-level permissions. Redact common credential assignments from exception messages and do not return stack traces.
 - **Usability**: Document the always-200 delivery-result behavior in the API schema/endpoint description; clients distinguish outcomes using the `success` field.
@@ -46,13 +49,15 @@ The HTTP 200 rule applies to a completed notification attempt, including deliver
 - **Operational constraints**: No additional rate limit, audit logging, or other operational constraint was requested.
 
 ## Acceptance Criteria
-1. An authorized caller can POST to `/rest/v2/notifiers/{id}/test` without an alert payload and trigger the existing sample notification flow for that notifier.
+1. An authorized caller can POST to `/rest/v2/notifiers/{id}/test` without an alert payload and trigger the existing sample notification flow for a persisted notifier.
 2. On successful delivery, the API returns HTTP 200 with `success: true` and a human-readable message.
 3. On delivery failure, the API returns HTTP 200 with `success: false` and a safe human-readable error summary.
 4. The API endpoint description states that both delivery outcomes return HTTP 200 and clients must inspect `success`.
 5. An unauthenticated or unauthorized caller cannot trigger delivery and receives the established REST authentication/permission error response.
 6. A request for a nonexistent notifier does not trigger delivery and receives the established not-found response.
 7. The response includes the delivery exception message with common credential assignments redacted and no stack trace.
+8. An authenticated caller can POST to `/rest/v2/notifiers/0/test` with `sender` and `value`; Promgen sends the sample synchronously using an unsaved notifier and persists nothing.
+9. Missing or unknown temporary notifier configuration returns HTTP 400 and does not attempt delivery; unauthenticated temporary tests return the standard HTTP 401 behavior.
 
 ## Traceability
 | Requirement | Source |
