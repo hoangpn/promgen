@@ -191,3 +191,9 @@ None.
 - Updated the assertion to match the established sanitizer behavior and reran with verbosity 1; all 11 tests passed, including the OpenAPI schema check.
 - Existing environment warnings remained: `/etc/prometheus` is not writable, and SQLite request-metric persistence logs table-lock warnings. They did not fail tests.
 - Updated the Build and Test summary, state, and Code Generation handoff summaries. The previously recorded three full-suite baseline failures are unchanged; Operations remains unstarted.
+
+## Saved Notifier Request Body — Design Approval
+- User request: “if test existing notifier, don't take the data from request body”.
+- Repository inspection confirmed `NotifierViewSet.test()` reads request data only for ID `0`; saved notifier IDs resolve the persisted object and call its test method without using request-body values.
+- Recommended and user-approved design: preserve behavior, add a regression test proving body values cannot override the saved notifier, and clarify that `sender` and `value` apply only to ID `0` and are ignored for saved notifier IDs.
+- Design record: `construction/plans/uow-1-saved-notifier-ignore-request-body-design.md`. Implementation planning is pending user review of this written spec.
