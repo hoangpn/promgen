@@ -4,7 +4,7 @@
 - **Project Name**: promgen
 - **Project Type**: Brownfield
 - **Start Date**: 2026-10-21T10:21:38+07:00
-- **Current Stage**: INCEPTION - Application Design (`exporter-scrape-reuse`)
+- **Current Stage**: CONSTRUCTION - Functional Design (`exporter-scrape-reuse`)
 
 ## Workspace State
 - **Existing Code**: Yes
@@ -41,6 +41,15 @@
 - [x] Code Generation (approved on 2026-10-21)
 - [x] Build and Test (approved on 2026-10-21; failures documented)
 
+## Construction Progress — exporter-scrape-reuse
+- [x] Functional Design (approved on 2026-10-21)
+- [ ] NFR Requirements (skipped per approved execution plan)
+- [ ] NFR Design (skipped per approved execution plan)
+- [ ] Infrastructure Design (skipped per approved execution plan)
+- [ ] Code Planning
+- [ ] Code Generation
+- [ ] Build and Test
+
 ## Follow-up Inception — exporter-scrape-reuse
 - [x] Workspace Detection (brownfield continuation)
 - [x] Reverse Engineering (focused overlap analysis)
@@ -55,7 +64,9 @@
 - **Phase**: Inception (follow-up refactor scope)
 - **Current Unit**: `exporter-scrape-reuse` (proposed)
 - **Previous Construction Result**: Build and Test approved; full suite had 2 failures and 1 error. See `construction/build-and-test/build-and-test-summary.md`.
-- **Current Inception Stage**: Complete; Construction Functional Design next.
+- **Current Stage**: CONSTRUCTION - Functional Design (`exporter-scrape-reuse`)
+- **Current Inception Stage**: Complete.
+- **Current Construction Stage**: Functional Design complete; Code Planning next.
 - **Current Unit of Work**: `exporter-scrape-reuse` (one approved unit).
 - **Previous Unit of Work**: `exporter-test-api`
 
@@ -80,7 +91,21 @@
 - **User input (raw)**: `approve`
 - **Decision**: Approved the single-unit decomposition and its generated deliverables; proceeded to Construction Functional Design.
 - **Stage summary**: `inception/stage-summaries/stage-7-units-generation-exporter-scrape-reuse-summary.md`.
-- **Status**: Inception complete for `exporter-scrape-reuse`; checkpoint pending.
+- **Status**: Inception complete for `exporter-scrape-reuse`; Units Generation checkpoint created.
+
+## 2026-10-21T11:42:34+07:00 — Construction Functional Design Review Requested
+- **Unit**: `exporter-scrape-reuse`.
+- **Deliverables**: `construction/exporter-scrape-reuse/functional-design/`.
+- **Design**: One shared per-target scrape-and-parse processor; preserve all legacy and REST endpoint policies and contracts at their current boundaries.
+- **Clarification questions**: None; the approved requirements, Application Design, and unit contract specify the behavior to preserve.
+- **Approval prompt**: “Please review the Functional Design deliverables for `exporter-scrape-reuse`. Reply `approve and continue` to approve the detailed behavior rules and proceed to Code Planning (NFR Requirements, NFR Design, and Infrastructure Design remain skipped per the approved execution plan), or request changes.”
+- **Status**: Waiting for explicit approval.
+
+## 2026-10-21T11:43:09+07:00 — Functional Design Approval
+- **User input (raw)**: `approve`
+- **Decision**: Approved Functional Design for `exporter-scrape-reuse`; continued to Code Planning.
+- **Stage summary**: `construction/exporter-scrape-reuse/stage-summaries/stage-1-functional-design-summary.md`.
+- **Status**: Functional Design complete; checkpoint pending.
 
 ## 2026-10-21T11:37:46+07:00 — Application Design Plan Approval and Deliverables Prepared
 - **User input (raw)**: `approve`

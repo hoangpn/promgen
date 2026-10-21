@@ -450,3 +450,18 @@ Are you ready to proceed to generation?
 - **User input (raw)**: `approve`
 - **Decision**: Approved the single unit and generated Units deliverables; continued to Construction Functional Design.
 - **Stage summary**: `inception/stage-summaries/stage-7-units-generation-exporter-scrape-reuse-summary.md`.
+
+## Units Generation Checkpoint — `exporter-scrape-reuse`
+- **Commit**: `3dd0448` (`aidd: inception/stage-7-units-generation`).
+- **Tag**: `aidd/inception/stage-7-units-generation-exporter-scrape-reuse-2026-10-21-8c46f10e`.
+
+## 2026-10-21T11:42:34+07:00 — Construction Functional Design Review Requested
+- **Unit**: `exporter-scrape-reuse`.
+- **Deliverables**: `construction/exporter-scrape-reuse/functional-design/business-logic-model.md`, `business-rules.md`, and `domain-entities.md`.
+- **Approval prompt**: “Please review the Functional Design deliverables for `exporter-scrape-reuse`. Reply `approve and continue` to approve the detailed behavior rules and proceed to Code Planning (NFR Requirements, NFR Design, and Infrastructure Design remain skipped per the approved execution plan), or request changes.”
+- **Status**: Waiting for explicit approval.
+
+## 2026-10-21T11:43:09+07:00 — Functional Design Approval
+- **User input (raw)**: `approve`
+- **Decision**: Approved the Functional Design for `exporter-scrape-reuse`; proceeded to Code Planning.
+- **Stage summary**: `construction/exporter-scrape-reuse/stage-summaries/stage-1-functional-design-summary.md`.
