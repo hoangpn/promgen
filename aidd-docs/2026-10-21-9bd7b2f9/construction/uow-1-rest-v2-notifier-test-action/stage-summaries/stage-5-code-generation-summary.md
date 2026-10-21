@@ -17,11 +17,10 @@
 | `inception/reverse-engineering/api-documentation.md` | Documented the conditional request and permission behavior. |
 
 ## Handoff Items for the Next Stage
-- Run focused API tests and schema checks in an environment with project dependencies, including `drf_spectacular`.
-- Confirm persisted notifier permission and not-found tests still pass alongside the new ID `0` cases.
+- Focused API tests and schema checks passed 11/11 in the project `.venv`, including persisted notifier permission and not-found cases.
 - Existing full-suite baseline failures remain documented in the Build and Test summary.
 
 ## Numeric Summary
 - 1 REST detail action supporting 2 notifier modes.
-- 5 new focused API test cases added; tests have not been run.
+- 5 new focused API test cases added; the complete notifier API class passed 11/11 tests during Build and Test.
 - 0 migrations or persistent data model changes.

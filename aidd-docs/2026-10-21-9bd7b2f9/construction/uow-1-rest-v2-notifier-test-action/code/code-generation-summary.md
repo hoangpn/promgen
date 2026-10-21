@@ -17,7 +17,7 @@
 - TDD red: the six tests initially failed because the `sender-test` route did not exist.
 - TDD green: targeted test run passed all 6 tests.
 - Ruff lint and format checks passed for all three modified Python files.
-- Temporary notifier amendment coverage was added but not run; the active Python environment does not have `drf_spectacular` installed.
+- After the amendment, `promgen.tests.test_rest.NotifierTestAPITest` passed all 11 tests, including schema generation. The focused run emitted existing `/etc/prometheus` write warnings and SQLite metric table-lock logs; see the Build and Test summary.
 - No migration, dependency, URL configuration, or deployment file was changed.
 
 ## Documentation Sync
