@@ -309,5 +309,20 @@ Are you ready to proceed to generation?
 ## 2026-10-21T11:08:21+07:00 — NFR Requirements Approval
 - **User input (raw)**: `approve`
 - **Decision**: Approved NFR Requirements and continued to NFR Design.
-- **Checkpoint**: Pending creation of commit and tag `aidd/construction/exporter-test-api/stage-2-nfr-requirements`.
+- **Checkpoint branch**: `aidd/promgen`
+- **Checkpoint commit**: `b0f3a43` (`aidd: construction/exporter-test-api/stage-2-nfr-requirements`)
+- **Checkpoint tag**: `aidd/construction/exporter-test-api/stage-2-nfr-requirements`
 - **Stage summary**: `construction/exporter-test-api/stage-summaries/stage-2-nfr-requirements-summary.md`.
+
+## 2026-10-21T11:09:48+07:00 — NFR Design Started
+- **Unit**: `exporter-test-api`
+- **Checkpoint basis**: Approved NFR Requirements at commit `b0f3a43`, tag `aidd/construction/exporter-test-api/stage-2-nfr-requirements`.
+- **Assessment**: Reused the existing `ExporterViewSet`, serializer, permission helper, Django settings, scrape utility/parser, and API schema boundaries.
+- **Stakeholder questions**: None; the approved NFR requirements specify the relevant design choices.
+- **Status**: NFR Design deliverables prepared for review.
+
+## 2026-10-21T11:10:13+07:00 — NFR Design Approval
+- **User input (raw)**: `approve`
+- **Decision**: Approved NFR Design and continued to Code Planning. Infrastructure Design remains skipped per the approved execution plan.
+- **Stage summary**: `construction/exporter-test-api/stage-summaries/stage-3-nfr-design-summary.md`.
+- **Checkpoint**: Creating the stage-3 commit and tag `aidd/construction/exporter-test-api/stage-3-nfr-design`.
