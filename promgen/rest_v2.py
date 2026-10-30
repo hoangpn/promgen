@@ -1,6 +1,7 @@
 # Copyright (c) 2026 LINE Corporation
 # These sources are released under the terms of the MIT license: see LICENSE
 import datetime
+import re
 import uuid
 from http import HTTPStatus
 
@@ -555,6 +556,60 @@ class NotifierViewSet(
         return serializers.NotifierSerializer
 
     @extend_schema(
+        summary="Test Notifier",
+        description=(
+            "Send the built-in sample alert synchronously through the configured notifier. "
+            "For notifier ID 0, provide sender and value in the request body to test a temporary "
+            "notifier without saving it. For saved notifier IDs, request-body fields are ignored "
+            "and the saved notifier configuration is used. "
+            "A completed delivery attempt returns HTTP 200 whether delivery succeeds or fails. "
+            "Inspect the success field to determine the delivery outcome. Authentication, "
+            "authorization, and not-found errors use the standard REST behavior."
+        ),
+        request=serializers.NotifierTestRequestSerializer,
+        responses={200: serializers.NotifierTestResultSerializer},
+    )
+    @action(
+        detail=True, methods=["post"], url_path="test", pagination_class=None, filterset_class=None
+    )
+    def test(self, request, id):
+        if id == "0":
+            serializer = serializers.NotifierTestRequestSerializer(
+                data=request.data, context={"require_configuration": True}
+            )
+            serializer.is_valid(raise_exception=True)
+            notifier = models.Sender(
+                sender=serializer.validated_data["sender"],
+                value=serializer.validated_data["value"],
+            )
+        else:
+            notifier = self.get_object()
+        try:
+            notifier.test()
+        except Exception as exc:
+            # Provider errors help diagnose a test send, but may include
+            # credentials. Redact common credential assignments and omit the
+            # traceback from the public response.
+            message = re.sub(
+                r"(?i)(token|password|secret|api[_-]?key|authorization)\s*[:=]\s*\S+",
+                r"\1=[redacted]",
+                str(exc),
+            )
+            message = " ".join(message.split())
+            if "Traceback (most recent call last):" in message:
+                message = ""
+            result = {
+                "success": False,
+                "message": "Test notification failed: %s" % (message or type(exc).__name__),
+            }
+        else:
+            result = {
+                "success": True,
+                "message": "Test notification sent.",
+            }
+        return Response(serializers.NotifierTestResultSerializer(result).data, status=HTTPStatus.OK)
+
+    @extend_schema(
         summary="Add Filter",
         description="Add a filter to the specified notifier.",
         request=serializers.FilterSerializer,
@@ -582,48 +637,6 @@ class NotifierViewSet(
         if notifier:
             models.Filter.objects.filter(pk=filter_id).delete()
         return Response(status=HTTPStatus.NO_CONTENT)
-
-    @extend_schema(
-        summary="Test Notifier",
-        description="Attempt to send a test notification. "
-        "The test result will be included in the response's body. "
-        "Use 0 for the ID to test against a new notifier without creating it.",
-        request=serializers.NotifierTestRequestSerializer,
-        responses={
-            200: inline_serializer(
-                name="NotifierTestResponseSerializer",
-                fields={
-                    "success": drf_serializers.BooleanField(),
-                    "message": drf_serializers.CharField(),
-                },
-            )
-        },
-    )
-    @action(
-        detail=True, methods=["post"], url_path="test", pagination_class=None, filterset_class=None
-    )
-    def test_notifier(self, request, id):
-        if int(id) == 0:
-            serializer = serializers.NotifierTestRequestSerializer(data=request.data)
-            serializer.is_valid(raise_exception=True)
-            notifier = models.Sender(
-                sender=serializer.validated_data["sender"], value=serializer.validated_data["value"]
-            )
-        else:
-            notifier = self.get_object()
-
-        try:
-            notifier.test()
-        except Exception as e:
-            success = False
-            message = "Error sending test message {} to {}: {}.".format(
-                notifier.sender, notifier.show_value(), str(e)
-            )
-        else:
-            success = True
-            message = "Sent test message {} to {}.".format(notifier.sender, notifier.show_value())
-        return Response({"success": success, "message": message}, status=HTTPStatus.OK)
-
 
 @extend_schema_view(
     list=extend_schema(summary="List Rules", description="Retrieve a list of all rules."),

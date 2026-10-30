@@ -238,6 +238,11 @@ class UpdateNotifierSerializer(serializers.ModelSerializer):
         fields = ["enabled"]
 
 
+class NotifierTestResultSerializer(serializers.Serializer):
+    success = serializers.BooleanField()
+    message = serializers.CharField()
+
+
 class RuleRetrieveSimpleSerializer(serializers.ModelSerializer):
     content_name = serializers.CharField(read_only=True, source="content_object.name")
     content_type = serializers.CharField(read_only=True, source="content_type.model")
@@ -682,11 +687,24 @@ class TokenCreateResponseSerializer(serializers.Serializer):
 class NotifierTestRequestSerializer(serializers.Serializer):
     sender = serializers.ChoiceField(
         choices=[name for name, _ in models.Sender.driver_set()],
+        required=False,
         help_text="The sender to test. Only required when the notifier ID is 0.",
     )
     value = serializers.CharField(
+        required=False,
         help_text="The value to test with. Only required when the notifier ID is 0."
     )
+
+    def validate(self, attrs):
+        if self.context.get("require_configuration"):
+            missing = {
+                field: "This field is required when testing a temporary notifier."
+                for field in ("sender", "value")
+                if field not in attrs
+            }
+            if missing:
+                raise serializers.ValidationError(missing)
+        return attrs
 
 
 class RuleTestRequestSerializer(serializers.Serializer):
